@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
+import 'package:flutter_application_1/Pages/login_screen.dart';
 import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:flutter_application_1/Constant/api_endpoint.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -41,17 +44,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
           context: context,
           builder: (_) => AlertDialog(
             title: const Text('Verification Success'),
-            content: const Text('Your email has been verified successfully!'),
+            content: const Text(
+              'Your email has been verified successfully!',
+            ),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserPage(
-                        userName: Username,
-                      ),
-                    ),
+                        builder: (context) => const LoginScreen()),
                   );
                 },
                 child: const Text('OK'),
@@ -91,28 +93,28 @@ class _VerificationScreenState extends State<VerificationScreen> {
     }
   }
 
-  Widget numButton(int number) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: TextButton(
-        onPressed: () {
-          setState(() {
-            if (enteredPin.length < 6) {
-              enteredPin += number.toString();
-            }
-            if (enteredPin.length == 6) {
-              verifyCode();
-            }
-          });
-        },
-        child: Text(
-          number.toString(),
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
+  Widget buildGridButton(String value, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap ??
+          () {
+            setState(() {
+              if (enteredPin.length < 6) {
+                enteredPin += value;
+              }
+              if (enteredPin.length == 6) {
+                verifyCode();
+              }
+            });
+          },
+      child: Container(
+        height: 70,
+        alignment: Alignment.center,
+        child: value == 'backspace'
+            ? const Icon(Icons.backspace, color: Colors.white)
+            : Text(
+                value,
+                style: const TextStyle(fontSize: 24, color: Colors.white),
+              ),
       ),
     );
   }
@@ -120,132 +122,210 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          physics: const BouncingScrollPhysics(),
-          children: [
-            const SizedBox(height: 20),
-            const Center(
-              child: Text(
-                'Enter Your Pin',
-                style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-
-            /// pin code area
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                6,
-                (index) {
-                  return Container(
-                    margin: const EdgeInsets.all(6.0),
-                    width: isPinVisible ? 50 : 16,
-                    height: isPinVisible ? 50 : 16,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6.0),
-                      color: index < enteredPin.length
-                          ? isPinVisible
-                              ? Colors.green
-                              : CupertinoColors.activeBlue
-                          : CupertinoColors.activeBlue.withOpacity(0.1),
-                    ),
-                    child: isPinVisible && index < enteredPin.length
-                        ? Center(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF1B7CA6), Color.fromARGB(255, 9, 7, 69)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            physics: const BouncingScrollPhysics(),
+            children: [
+              const SizedBox(height: 40),
+              Stack(
+                children: [
+                  SizedBox(
+                    height: 180,
+                    width: double.infinity,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Image.asset(
+                            'Assets/images/leftApp.PNG',
+                            width: 110,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Image.asset(
+                            'Assets/images/rightApp.PNG',
+                            width: 110,
+                          ),
+                        ),
+                        const Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 50),
                             child: Text(
-                              enteredPin[index],
-                              style: const TextStyle(
-                                fontSize: 17,
+                              'PIN\nVERIFICATION',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white,
-                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                          )
-                        : null,
-                  );
-                },
-              ),
-            ),
-
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  isPinVisible = !isPinVisible;
-                });
-              },
-              icon: Icon(
-                isPinVisible ? Icons.visibility_off : Icons.visibility,
-              ),
-            ),
-
-            if (isVerifying)
-              const Center(
-                child: CircularProgressIndicator(),
-              )
-            else
-              const SizedBox(height: 16),
-
-            /// digit buttons
-            for (var i = 0; i < 3; i++)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(
-                    3,
-                    (index) => numButton(1 + 3 * i + index),
-                  ),
-                ),
-              ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(width: 64), // Placeholder
-                  numButton(0),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        if (enteredPin.isNotEmpty) {
-                          enteredPin =
-                              enteredPin.substring(0, enteredPin.length - 1);
-                        }
-                      });
-                    },
-                    child: const Icon(
-                      Icons.backspace,
-                      color: Colors.black,
-                      size: 24,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
+              //const SizedBox(height: 15),
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(103, 27, 89, 235),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 30, 16, 70),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Center(
+                      child: Text(
+                        'Enter Your Pin',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  enteredPin = '';
-                });
-              },
-              child: const Text(
-                'Reset',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
+                    /// PIN circles
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(6, (index) {
+                        return Container(
+                          margin: const EdgeInsets.all(4.0),
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(7.0),
+                            color: index < enteredPin.length
+                                ? const Color.fromARGB(255, 9, 7, 69)
+                                : const Color.fromRGBO(33, 150, 243, 1),
+                          ),
+                          child: index < enteredPin.length
+                              ? Center(
+                                  child: isPinVisible
+                                      ? Text(
+                                          enteredPin[index],
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.circle,
+                                          size: 10,
+                                          color: Colors.white,
+                                        ),
+                                )
+                              : null,
+                        );
+                      }),
+                    ),
+
+                    /// Show/Hide PIN
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isPinVisible = !isPinVisible;
+                        });
+                      },
+                      icon: Icon(
+                        isPinVisible ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    if (isVerifying)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      const SizedBox(height: 16),
+
+                    /// RED BORDER TABLE KEYPAD
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Table(
+                        border: const TableBorder.symmetric(
+                          inside: BorderSide(
+                            color: const Color.fromARGB(102, 255, 255, 255),
+                            width: 2,
+                          ),
+                        ),
+                        children: [
+                          TableRow(
+                            children: [
+                              buildGridButton('1'),
+                              buildGridButton('2'),
+                              buildGridButton('3'),
+                            ],
+                          ),
+                          TableRow(
+                            children: [
+                              buildGridButton('4'),
+                              buildGridButton('5'),
+                              buildGridButton('6'),
+                            ],
+                          ),
+                          TableRow(
+                            children: [
+                              buildGridButton('7'),
+                              buildGridButton('8'),
+                              buildGridButton('9'),
+                            ],
+                          ),
+                          TableRow(
+                            children: [
+                              buildGridButton(
+                                'Reset',
+                                onTap: () {
+                                  setState(() {
+                                    enteredPin = '';
+                                  });
+                                },
+                              ),
+                              buildGridButton('0'),
+                              buildGridButton(
+                                'backspace',
+                                onTap: () {
+                                  setState(() {
+                                    if (enteredPin.isNotEmpty) {
+                                      enteredPin = enteredPin.substring(
+                                        0,
+                                        enteredPin.length - 1,
+                                      );
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

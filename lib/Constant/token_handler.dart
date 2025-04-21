@@ -1,22 +1,28 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class TokenHandler {
-  static final TokenHandler _instance = TokenHandler._internal();
-  factory TokenHandler() => _instance;
-
-  TokenHandler._internal();
-
-  String _jwtToken = "";
-
-  void addToken(String token) {
-    if (token.isNotEmpty) {
-      _jwtToken = token;
-    }
+  Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('jwt_token', token);
   }
 
-  String getToken() {
-    return _jwtToken;
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('jwt_token');
   }
 
-  void clearToken() {
-    _jwtToken = "";
+  Future<void> saveUserName(String userName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', userName);
+  }
+
+  Future<String?> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_name');
+  }
+
+  Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }

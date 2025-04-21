@@ -47,8 +47,8 @@ class ChooseScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Center(
-                    child: const Text(
+                  const Center(
+                    child: Text(
                       '  VDECT.',
                       style: TextStyle(
                         color: Color(0xFF100F23),

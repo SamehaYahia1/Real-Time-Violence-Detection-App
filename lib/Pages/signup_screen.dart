@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
+import 'package:flutter_application_1/Constant/colors.dart';
+import 'package:flutter_application_1/Constant/custom_padding_field.dart';
 import 'package:flutter_application_1/Constant/custom_password_field.dart';
 import 'package:flutter_application_1/Constant/custom_text_field.dart';
 import 'package:flutter_application_1/Pages/verification_screen.dart';
@@ -24,17 +26,31 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _roleController =
       TextEditingController(text: "User");
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _obscureText = true;
   bool _isLoading = false;
   String? _errorText;
   String? _errorTextEmail;
   String? _errorTextPass;
 
-  void _toggleVisibility() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
+  String _extractErrorMessage(String responseBody) {
+    try {
+      final decoded = json.decode(responseBody);
+
+      if (decoded is Map<String, dynamic>) {
+        String message =
+            decoded['detail'] ?? decoded['message'] ?? "Something went wrong.";
+
+        // ✨ Format long error message to add line breaks after commas
+        if (message.contains(',')) {
+          message = message.replaceAll(', ', ',\n');
+        }
+
+        return message;
+      } else {
+        return decoded.toString();
+      }
+    } catch (e) {
+      return responseBody;
+    }
   }
 
   Future<void> register() async {
@@ -53,6 +69,8 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _isLoading = true;
       _errorText = null;
+      _errorTextEmail = null;
+      _errorTextPass = null;
     });
 
     final registrationData = {
@@ -99,26 +117,27 @@ class _SignupScreenState extends State<SignupScreen> {
           ],
         ),
       );
-    } else if (response.statusCode == 400) {
-      setState(() {
-        _errorTextEmail =
-            "You cannot have more than two accounts with the same email";
-        _errorText = null;
-      });
-    } else if (response.statusCode == 402) {
-      setState(() {
-        _errorText = "Username is already taken !";
-        _errorTextEmail = null;
-      });
-    } else if (response.statusCode == 401) {
-      setState(() {
-        _errorTextPass = "Please use strong password";
-        _errorText = null;
-        _errorTextEmail = null;
-      });
     } else {
+      String errorMessage = _extractErrorMessage(response.body);
+
       setState(() {
-        _errorText = "Something went wrong. Please try again later.";
+        if (errorMessage.toLowerCase().contains("email")) {
+          _errorTextEmail = errorMessage;
+          _errorText = null;
+          _errorTextPass = null;
+        } else if (errorMessage.toLowerCase().contains("password")) {
+          _errorTextPass = errorMessage;
+          _errorText = null;
+          _errorTextEmail = null;
+        } else if (errorMessage.toLowerCase().contains("username")) {
+          _errorText = errorMessage;
+          _errorTextEmail = null;
+          _errorTextPass = null;
+        } else {
+          _errorText = errorMessage;
+          _errorTextEmail = null;
+          _errorTextPass = null;
+        }
       });
     }
   }
@@ -131,7 +150,10 @@ class _SignupScreenState extends State<SignupScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1B7CA6), Color(0xff100e48)],
+                colors: [
+                  colors.backgroundColor,
+                  colors.secondaryBackgroundColor
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -169,7 +191,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 style: TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                                    color: colors.secondaryColor),
                               ),
                             ),
                           ),
@@ -179,7 +201,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     Container(
                       width: double.infinity,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF100F23),
+                        color: colors.contColor,
                         borderRadius: BorderRadius.all(Radius.circular(40)),
                       ),
                       padding: const EdgeInsets.symmetric(
@@ -188,8 +210,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         children: [
                           const Text(
                             'Enter your signup information',
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 18),
+                            style: TextStyle(
+                                color: colors.secondaryColor, fontSize: 18),
                           ),
                           const SizedBox(height: 15),
 
@@ -200,102 +222,73 @@ class _SignupScreenState extends State<SignupScreen> {
                               icon: Icons.person),
 
                           // Username
-                          Padding(
-                            padding: const EdgeInsets.all(13.0),
-                            child: TextFormField(
-                              controller: _usernameController,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              style: const TextStyle(color: Colors.white),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Username is required';
-                                }
-                                if (_errorText != null) {
-                                  return _errorText;
-                                }
-                                return null;
-                              },
-                              onChanged: (_) {
-                                // btshel el error lam el user ybda2 yktb w terg3 t check tany
-                                if (_errorText != null) {
-                                  setState(() {
-                                    _errorText = null;
-                                  });
-                                }
-                              },
-                              decoration: InputDecoration(
-                                prefixIcon:
-                                    Icon(Icons.person, color: Colors.white),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                labelText: 'Username',
-                                labelStyle: TextStyle(color: Colors.white70),
-                              ),
+                          CustomPaddingField(
+                            controller: _usernameController,
+                            labelText: 'Username',
+                            obscureText: false,
+                            prefixIcon: const Icon(
+                              Icons.person,
+                              color: colors.secondaryColor,
                             ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Username is required';
+                              }
+                              if (_errorText != null) {
+                                return _errorText;
+                              }
+                              return null;
+                            },
+                            onChanged: (_) {
+                              // // btshel el error lam el user ybda2 yktb w terg3 t check tany
+                              if (_errorText != null) {
+                                setState(() {
+                                  _errorText = null;
+                                });
+                              }
+                            },
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(13.0),
-                            child: TextFormField(
-                              controller: _emailController,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              style: const TextStyle(color: Colors.white),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Email is required';
-                                }
-                                if (_errorTextEmail != null) {
-                                  return _errorTextEmail;
-                                }
-                                return null;
-                              },
-                              onChanged: (_) {
-                                if (_errorTextEmail != null) {
-                                  setState(() {
-                                    _errorTextEmail = null;
-                                  });
-                                }
-                              },
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.person,
-                                    color: Colors.white),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                labelText: 'Email',
-                                labelStyle:
-                                    const TextStyle(color: Colors.white70),
-                              ),
+                          //email
+                          CustomPaddingField(
+                            controller: _emailController,
+                            labelText: 'Email',
+                            obscureText: false,
+                            prefixIcon: const Icon(
+                              Icons.email,
+                              color: colors.secondaryColor,
                             ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Email is required';
+                              }
+                              if (_errorTextEmail != null) {
+                                return _errorTextEmail;
+                              }
+                              return null;
+                            },
+                            onChanged: (_) {
+                              if (_errorTextEmail != null) {
+                                setState(() {
+                                  _errorTextEmail = null;
+                                });
+                              }
+                            },
                           ),
                           // Password
-                          Padding(
-                            padding: const EdgeInsets.all(13.0),
-                            child: TextFormField(
+                          CustomPasswordField(
                               controller: _passwordController,
-                              obscureText: true,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              style: const TextStyle(color: Colors.white),
+                              label: 'Enter Your Password',
+                              errorText: _errorTextPass,
                               validator: (value) {
-                                if (value!.isEmpty) {
+                                if (value!.trim().isEmpty) {
                                   return 'Password is required';
-                                } else if (value.length < 5) {
-                                  return 'Password must be more than 5 characters';
                                 }
-                                if (_errorTextPass != null) {
-                                  return _errorTextPass;
+                                if (value.length < 5) {
+                                  return 'Password must be at least 5 characters';
                                 }
+                                // if (_errorTextPass != null) {
+                                //  return _errorTextPass;
+                                // //}
                                 return null;
                               },
                               onChanged: (_) {
@@ -304,47 +297,28 @@ class _SignupScreenState extends State<SignupScreen> {
                                     _errorTextPass = null;
                                   });
                                 }
-                              },
-                              decoration: InputDecoration(
-                                prefixIcon:
-                                    const Icon(Icons.lock, color: Colors.white),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscureText
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: _toggleVisibility,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                labelText: 'Password',
-                                labelStyle:
-                                    const TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                          ),
+                              }),
                           // Confirm Password
                           CustomPasswordField(
-                              controller: _confirmPasswordController,
-                              label: 'Confirm Password'),
+                            controller: _confirmPasswordController,
+                            label: 'Confirm Password',
+                            validator: (value) {
+                              if (value!.trim().isEmpty) {
+                                return 'Password is required';
+                              }
+                            },
+                          ),
                           const SizedBox(height: 20),
                           // Sign Up button or Spinner
                           SizedBox(
                             width: double.infinity,
                             child: _isLoading
                                 ? const SpinKitCircle(
-                                    color: Colors.white, size: 50.0)
+                                    color: colors.secondaryColor, size: 50.0)
                                 : ElevatedButton(
                                     onPressed: register,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF3867F4),
+                                      backgroundColor: colors.secondaryColor2,
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 14),
                                       shape: RoundedRectangleBorder(
@@ -355,7 +329,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       'SIGN UP',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black),
+                                          color: colors.primaryColor),
                                     ),
                                   ),
                           ),
@@ -364,11 +338,12 @@ class _SignupScreenState extends State<SignupScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text("Already have an account?",
-                                  style: TextStyle(color: Colors.white70)),
+                                  style: TextStyle(color: colors.textColor)),
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
                                 child: const Text('Sign In',
-                                    style: TextStyle(color: Color(0xFF3867F4))),
+                                    style: TextStyle(
+                                        color: colors.secondaryColor2)),
                               ),
                             ],
                           ),

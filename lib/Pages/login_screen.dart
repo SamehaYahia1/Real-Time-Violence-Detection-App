@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
+import 'package:flutter_application_1/Constant/colors.dart';
+import 'package:flutter_application_1/Constant/custom_padding_field.dart';
+import 'package:flutter_application_1/Constant/custom_password_field.dart';
 import 'dart:convert';
 import 'package:flutter_application_1/Constant/token_handler.dart';
 import 'package:flutter_application_1/Pages/signup_screen.dart';
@@ -20,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _obscureText = true;
   bool _isLoading = false;
   String? _loginError;
   String? _errorTextPass;
@@ -32,10 +34,16 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _toggleVisibility() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
+  String _extractLoginErrorMessage(String responseBody) {
+    try {
+      final decoded = json.decode(responseBody);
+      if (decoded is Map<String, dynamic> && decoded.containsKey('title')) {
+        return decoded['title'];
+      }
+      return responseBody;
+    } catch (e) {
+      return responseBody;
+    }
   }
 
   Future<void> login() async {
@@ -63,15 +71,18 @@ class _LoginScreenState extends State<LoginScreen> {
           if (token == null) {
             throw Exception("Token not found in response.");
           }
-
-          TokenHandler().addToken(token);
-
           final decodedToken = JwtDecoder.decode(token);
-          final role = decodedToken['roles'] ?? '';
-          final nameClaim = decodedToken[
-              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+          final role = decodedToken[
+                  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ??
+              '';
+          final nameClaim = decodedToken["name"];
           final userName = nameClaim is List ? nameClaim[0] : nameClaim;
+          await TokenHandler().saveToken(token);
+          await TokenHandler().saveUserName(userName);
           if (!mounted) return;
+          setState(() {
+            _isLoading = false;
+          });
           if (role.contains("User")) {
             Navigator.pushReplacement(
               context,
@@ -90,16 +101,19 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         } else if (response.statusCode == 400) {
           setState(() {
-            _loginError = 'User not found';
+            _loginError = _extractLoginErrorMessage(response.body);
             _errorTextPass = null;
           });
           _formKey.currentState!.validate();
         } else if (response.statusCode == 401) {
           setState(() {
-            _errorTextPass = 'Incorrect password';
+            _errorTextPass = _extractLoginErrorMessage(response.body);
             _loginError = null;
           });
         } else {
+          setState(() {
+            _isLoading = false;
+          });
           print("Unexpected error: ${response.statusCode}");
         }
       } catch (e) {
@@ -120,8 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [
-                Color(0xFF1B7CA6),
-                Color(0xff100e48),
+                colors.secondaryColor2,
+                colors.secondaryBackgroundColor,
               ]),
             ),
           ),
@@ -163,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: colors.secondaryColor,
                                   ),
                                 ),
                               ),
@@ -189,99 +203,59 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text(
                             'Enter your login information',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: colors.textColor,
                               fontSize: 18,
                             ),
                           ),
                           const SizedBox(height: 30),
-                          Padding(
-                            padding: const EdgeInsets.all(13.0),
-                            child: TextFormField(
-                              controller: _userNameController,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              style: const TextStyle(color: Colors.white),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Username is required';
-                                }
-                                if (_loginError != null) {
-                                  return _loginError;
-                                }
-                                return null;
-                              },
-                              onChanged: (_) {
-                                if (_loginError != null) {
-                                  setState(() {
-                                    _loginError = null;
-                                  });
-                                }
-                              },
-                              decoration: InputDecoration(
-                                prefixIcon:
-                                    Icon(Icons.person, color: Colors.white),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                labelText: 'Username',
-                                labelStyle: TextStyle(color: Colors.white),
-                              ),
-                            ),
+                          //username
+                          CustomPaddingField(
+                            controller: _userNameController,
+                            labelText: 'Username',
+                            prefixIcon:
+                                const Icon(Icons.person, color: Colors.white),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Username is required';
+                              }
+                              if (_loginError != null) {
+                                return _loginError;
+                              }
+                              return null;
+                            },
+                            onChanged: (_) {
+                              if (_loginError != null) {
+                                setState(() {
+                                  _loginError = null;
+                                });
+                              }
+                            },
                           ),
                           const SizedBox(height: 8),
-                          Padding(
-                            padding: const EdgeInsets.all(13.0),
-                            child: TextFormField(
-                              controller: _passwordController,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              style: const TextStyle(color: Colors.white),
-                              obscureText: _obscureText,
-                              validator: (value) {
-                                if (value!.trim().isEmpty) {
-                                  return 'Password is required';
-                                }
-                                if (_errorTextPass != null) {
-                                  return _errorTextPass;
-                                }
-                                return null;
-                              },
-                              onChanged: (_) {
-                                if (_errorTextPass != null) {
-                                  // _errorTextPass=401
-                                  setState(() {
-                                    _errorTextPass = null;
-                                  });
-                                }
-                              },
-                              decoration: InputDecoration(
-                                prefixIcon:
-                                    const Icon(Icons.lock, color: Colors.white),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscureText
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: _toggleVisibility,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                labelText: 'Enter Your Password',
-                                labelStyle:
-                                    const TextStyle(color: Colors.white),
-                              ),
-                            ),
+                          CustomPasswordField(
+                            controller: _passwordController,
+                            label: 'Password',
+                            validator: (value) {
+                              if (value!.trim().isEmpty) {
+                                return 'Password is required';
+                              }
+                              if (value.length < 5) {
+                                return 'Password must be at least 5 characters';
+                              }
+
+                              if (_errorTextPass != null) {
+                                return _errorTextPass;
+                              }
+                              return null;
+                            },
+                            onChanged: (_) {
+                              if (_errorTextPass != null) {
+                                // _errorTextPass=401
+                                setState(() {
+                                  _errorTextPass = null;
+                                });
+                              }
+                            },
                           ),
                           const SizedBox(height: 10),
                           Row(
@@ -293,12 +267,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     value: false,
                                     onChanged: (value) {},
                                     side:
-                                        const BorderSide(color: Colors.white54),
+                                        const BorderSide(color: colors.white2),
                                     checkColor: Colors.black,
                                   ),
                                   const Text(
                                     'Remember me',
-                                    style: TextStyle(color: Colors.white70),
+                                    style: TextStyle(color: colors.textColor),
                                   ),
                                 ],
                               ),
@@ -306,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () {},
                                 child: const Text(
                                   'Forgot password',
-                                  style: TextStyle(color: Colors.white70),
+                                  style: TextStyle(color: colors.textColor),
                                 ),
                               ),
                             ],
@@ -319,7 +293,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: ElevatedButton.styleFrom(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 16),
-                                  backgroundColor: const Color(0xFF3867F4),
+                                  backgroundColor: colors.secondaryColor2,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -329,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         height: 30,
                                         width: 30,
                                         child: SpinKitFadingCircle(
-                                          color: Colors.black,
+                                          color: colors.primaryColor,
                                           size: 30.0,
                                         ),
                                       )
@@ -338,19 +312,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                         'LOGIN',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.black),
+                                            color: colors.primaryColor),
                                       )),
                           ),
                           const SizedBox(height: 20),
                           const Row(
                             children: [
-                              Expanded(child: Divider(color: Colors.white24)),
+                              Expanded(
+                                  child: Divider(color: colors.accentColor)),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text('Or',
-                                    style: TextStyle(color: Colors.white60)),
+                                    style: TextStyle(color: colors.white)),
                               ),
-                              Expanded(child: Divider(color: Colors.white24)),
+                              Expanded(
+                                  child: Divider(color: colors.accentColor)),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -361,12 +337,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: OutlinedButton.icon(
                                   onPressed: () {},
                                   icon: const Icon(Icons.g_mobiledata,
-                                      size: 28, color: Colors.white),
+                                      size: 28, color: colors.secondaryColor),
                                   label: const Text('GOOGLE',
-                                      style: TextStyle(color: Colors.white)),
+                                      style: TextStyle(
+                                          color: colors.secondaryColor)),
                                   style: OutlinedButton.styleFrom(
-                                    side:
-                                        const BorderSide(color: Colors.white24),
+                                    side: const BorderSide(
+                                        color: colors.accentColor),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12),
                                     shape: RoundedRectangleBorder(
@@ -384,19 +361,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             children: [
                               const Text(
                                 "Don't have an account?",
-                                style: TextStyle(color: Colors.white70),
+                                style: TextStyle(color: colors.textColor),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => SignupScreen()),
+                                        builder: (context) =>
+                                            const SignupScreen()),
                                   );
                                 },
                                 child: const Text(
                                   'Sign Up',
-                                  style: TextStyle(color: Color(0xFF3867F4)),
+                                  style:
+                                      TextStyle(color: colors.secondaryColor2),
                                 ),
                               ),
                             ],

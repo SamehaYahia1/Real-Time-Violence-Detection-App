@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Constant/colors.dart';
 import 'package:flutter_application_1/Pages/choose_screen.dart';
+import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -25,22 +28,42 @@ class _SplashScreenState extends State<SplashScreen>
 
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
+    // Start the animation
     Future.delayed(const Duration(milliseconds: 200), () {
       setState(() {
         _visible = true;
       });
       _controller.forward();
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 5), () {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const ChooseScreen()),
-          );
-        }
-      });
+
+    // Navigate after 5 seconds to allow animation to complete
+    Future.delayed(const Duration(seconds: 5), () {
+      _navigateBasedOnLoginStatus();
     });
+  }
+
+  Future<void> _navigateBasedOnLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+    final userName = prefs.getString('user_name');
+
+    if (!mounted) return;
+
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => UserPage(userName: userName ?? "User"),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ChooseScreen(),
+        ),
+      );
+    }
   }
 
   @override
@@ -57,15 +80,11 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1B7CA6),
-              Color(0xff100e48),
-            ],
+            colors: [colors.backgroundColor, colors.secondaryBackgroundColor],
           ),
         ),
         child: Stack(
           children: [
-            // Top Shape
             AnimatedPositioned(
               duration: const Duration(milliseconds: 800),
               curve: Curves.easeOut,
@@ -76,8 +95,6 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 150,
               ),
             ),
-
-            // Bottom Shape
             AnimatedPositioned(
               duration: const Duration(milliseconds: 800),
               curve: Curves.easeOut,
@@ -88,15 +105,13 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 150,
               ),
             ),
-
-            // Center Logo
             Center(
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: const Text(
                   'VDECT.',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colors.secondaryColor,
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomPaddingField extends StatelessWidget {
+class CustomPaddingField extends StatefulWidget {
   final TextEditingController controller;
   final String labelText;
   final Icon prefixIcon;
@@ -21,20 +21,23 @@ class CustomPaddingField extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CustomPaddingField> createState() => _CustomPaddingFieldState();
+}
+
+class _CustomPaddingFieldState extends State<CustomPaddingField> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(13.0),
       child: TextFormField(
-        controller: controller,
+        controller: widget.controller,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        // validator: (value) =>
-        //     value!.trim().isEmpty ? '$labelText is required' : null,
-        obscureText: obscureText,
+        validator: widget.validator,
         style: const TextStyle(color: Colors.white),
-        onChanged: onChanged,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
+          prefixIcon: widget.prefixIcon,
+          suffixIcon: widget.suffixIcon,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -42,7 +45,7 @@ class CustomPaddingField extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(color: Colors.white),
           ),
-          labelText: labelText,
+          labelText: widget.labelText,
           labelStyle: const TextStyle(color: Colors.white70),
         ),
       ),
