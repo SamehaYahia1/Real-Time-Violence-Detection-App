@@ -10,7 +10,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen({
+    super.key,
+  });
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -97,24 +99,29 @@ class _SignupScreenState extends State<SignupScreen> {
 
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Registration Success'),
-          content: Text(message), //fist message
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // close dialog
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        VerificationScreen(email: _emailController.text),
-                  ),
-                );
-              },
-              child: const Text('Go to Verification'),
-            ),
-          ],
+        barrierDismissible: false, // 🚫 Prevent tap outside to close
+        builder: (context) => WillPopScope(
+          // 🚫 Prevent back button
+          onWillPop: () async => false,
+          child: AlertDialog(
+            title: const Text('Registration Success'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          VerificationScreen(email: _emailController.text),
+                    ),
+                  );
+                },
+                child: const Text('Go to Verification'),
+              ),
+            ],
+          ),
         ),
       );
     } else {
