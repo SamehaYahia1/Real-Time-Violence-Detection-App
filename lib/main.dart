@@ -5,6 +5,7 @@ import 'package:flutter_application_1/Pages/signup_screen.dart';
 import 'package:flutter_application_1/Pages/splash_screen.dart';
 import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_application_1/Pages/choose_your_plan.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
           '/choose': (context) => const ChooseScreen(),
           '/login': (context) => const LoginScreen(),
           '/signup': (context) => const SignupScreen(),
+          '/plans': (context) => const ChoosePlanScreen(userName: 'User'),
           '/userHome': (context) => const UserPage(userName: 'User'),
           '/adminHome': (context) => const UserPage(userName: 'Admin'),
         });
