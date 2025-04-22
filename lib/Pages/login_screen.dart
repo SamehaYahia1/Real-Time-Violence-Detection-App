@@ -11,6 +11,7 @@ import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'choose_your_plan.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -87,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => UserPage(userName: userName),
+                builder: (_) => ChoosePlanScreen(userName: userName),
               ),
             );
           } else {
