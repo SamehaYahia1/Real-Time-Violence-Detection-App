@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
 import 'package:flutter_application_1/Pages/login_screen.dart';
-import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -18,6 +17,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   String enteredPin = '';
   bool isPinVisible = false;
   bool isVerifying = false;
+  bool send = false;
 
   Future<void> verifyCode() async {
     setState(() {
