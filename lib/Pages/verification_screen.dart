@@ -2,11 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
 import 'package:flutter_application_1/Pages/login_screen.dart';
-import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'package:flutter_application_1/Constant/api_endpoint.dart';
 
 class VerificationScreen extends StatefulWidget {
   final String email;
@@ -20,7 +17,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   String enteredPin = '';
   bool isPinVisible = false;
   bool isVerifying = false;
-  String Username = '';
+  bool send = false;
 
   Future<void> verifyCode() async {
     setState(() {
@@ -40,26 +37,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
       );
 
       if (response.statusCode == 200) {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('Verification Success'),
-            content: const Text(
-              'Your email has been verified successfully!',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginScreen()),
-                  );
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+        setState(() {
+          enteredPin = ''; // Reset PIN on success
+        });
+
+        // Navigate to user page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       } else {
         String errorMessage = 'Verification failed. Please try again.';
@@ -70,6 +55,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
           print('Error decoding response: $e');
         }
 
+        // Show error dialog and reset PIN
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -77,7 +63,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
             content: Text(errorMessage),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    enteredPin = '';
+                  });
+                },
                 child: const Text('OK'),
               ),
             ],
@@ -180,7 +171,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                 ],
               ),
-              //const SizedBox(height: 15),
               Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
@@ -205,8 +195,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    /// PIN circles
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(6, (index) {
@@ -241,8 +229,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         );
                       }),
                     ),
-
-                    /// Show/Hide PIN
                     IconButton(
                       onPressed: () {
                         setState(() {
@@ -254,19 +240,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         color: Colors.white,
                       ),
                     ),
-
                     if (isVerifying)
                       const Center(child: CircularProgressIndicator())
                     else
                       const SizedBox(height: 16),
-
-                    /// RED BORDER TABLE KEYPAD
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Table(
                         border: const TableBorder.symmetric(
                           inside: BorderSide(
-                            color: const Color.fromARGB(102, 255, 255, 255),
+                            color: Color.fromARGB(102, 255, 255, 255),
                             width: 2,
                           ),
                         ),

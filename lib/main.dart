@@ -3,11 +3,13 @@ import 'package:flutter_application_1/Pages/choose_screen.dart';
 import 'package:flutter_application_1/Pages/login_screen.dart';
 import 'package:flutter_application_1/Pages/signup_screen.dart';
 import 'package:flutter_application_1/Pages/splash_screen.dart';
+import 'package:flutter_application_1/Pages/subscription_plan.dart';
 import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_application_1/Pages/choose_your_plan.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        //title: 'Flutter Demo',
+        title: 'Flutter Demo',
         initialRoute: '/',
         routes: {
           '/': (context) => const SplashScreen(),
