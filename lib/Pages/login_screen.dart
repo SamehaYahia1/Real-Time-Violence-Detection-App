@@ -77,7 +77,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ??
               '';
           final nameClaim = decodedToken["name"];
+          final userId = decodedToken[
+              "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+          final SubscriptionId = decodedToken["SubscriptionPlanId"];
           final userName = nameClaim is List ? nameClaim[0] : nameClaim;
+          final subscriptionPlanIdInt = int.tryParse(SubscriptionId);
+          if (subscriptionPlanIdInt == null) {
+            throw Exception("Invalid SubscriptionPlanId");
+          }
           await TokenHandler().saveToken(token);
           await TokenHandler().saveUserName(userName);
           if (!mounted) return;
@@ -85,12 +92,27 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
           if (role.contains("User")) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChoosePlanScreen(userName: userName),
-              ),
-            );
+            // Navigate based on SubscriptionPlanId
+            if (subscriptionPlanIdInt > 0) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => UserPage(
+                    userName: userName,
+                  ),
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChoosePlanScreen(
+                      userName: userName,
+                      userId: userId,
+                      SubscriptionId: SubscriptionId),
+                ),
+              );
+            }
           } else {
             if (!mounted) return;
             Navigator.pushReplacement(

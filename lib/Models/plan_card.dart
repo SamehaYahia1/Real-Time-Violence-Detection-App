@@ -26,6 +26,21 @@ class PlanCard extends StatelessWidget {
     final cardColor = isSelected ? const Color(0xFF4196FD) : Colors.white;
     final iconColor = isSelected ? Colors.blue[900] : Colors.blue;
 
+    // Features to display
+    final List<String> features = [
+      plan.enableStreaming ? 'Live Streaming Enabled' : 'No Live Streaming',
+      plan.enableFullStreamStorage
+          ? 'Full Stream Storage Enabled'
+          : 'No Full Stream Storage',
+      plan.enableAIDetection ? 'AI Detection Enabled' : 'No AI Detection',
+      plan.enableAIChunkStorage
+          ? 'AI Chunk Storage Enabled'
+          : 'No AI Chunk Storage',
+      'Full Stream Retention: ${plan.fullStreamRetentionHours} hours',
+      'AI Chunk Retention: ${plan.aiChunkRetentionHours} hours',
+      'Max Storage: ${plan.maxTotalStorageMB} MB',
+    ];
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -34,7 +49,7 @@ class PlanCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 15,
@@ -47,16 +62,13 @@ class PlanCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(plan.title,
+                    Text(plan.name,
                         style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: titleColor)),
-                    const SizedBox(height: 6),
-                    Text(plan.price, style: TextStyle(color: subTextColor)),
-                    Text(plan.users, style: TextStyle(color: subTextColor)),
                     const SizedBox(height: 12),
-                    ...plan.features.map(
+                    ...features.map(
                       (feature) => Row(
                         children: [
                           Icon(LucideIcons.check, color: iconColor, size: 20),
@@ -78,21 +90,17 @@ class PlanCard extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: onBackTap,
-                              icon: Icon(
+                              icon: const Icon(
                                 LucideIcons.arrowLeft,
                                 color: Colors.blueAccent,
                               ),
                               label: const Text("Back"),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors
-                                    .white, // This sets the button's background to white
-                                foregroundColor: Colors
-                                    .blueAccent, // Color of the text and icon
-                                elevation: 0, // Remove elevation
-                                shadowColor:
-                                    Colors.transparent, // Remove shadow
-                                shape:
-                                    const StadiumBorder(), // Keeps the shape as stadium border
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.blueAccent,
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
+                                shape: const StadiumBorder(),
                               ),
                             ),
                           ),
@@ -101,29 +109,23 @@ class PlanCard extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: onRequestTap ??
                                   () {
-                                    // This is where the navigation happens when the button is pressed
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => const UserPage(
-                                              userName:
-                                                  'User')), // Navigate to UserPage
+                                          builder: (context) =>
+                                              const UserPage(userName: 'User')),
                                     );
                                   },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Colors.white, // White background
-                                foregroundColor:
-                                    Colors.blueAccent, // Color of text and icon
-                                elevation: 0, // No elevation
-                                shadowColor:
-                                    Colors.transparent, // Remove shadow
-                                shape:
-                                    const StadiumBorder(), // Keeps the shape as stadium border
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.blueAccent,
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
+                                shape: const StadiumBorder(),
                               ),
-                              child: Row(
+                              child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Text("Request"),
                                   SizedBox(width: 8),
                                   Icon(LucideIcons.arrowRight,
@@ -141,13 +143,13 @@ class PlanCard extends StatelessWidget {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(plan.title,
+                  Text(plan.name,
                       style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                           color: titleColor)),
                   const SizedBox(height: 10),
-                  Text(plan.price,
+                  Text('Max Storage: ${plan.maxTotalStorageMB} MB',
                       style: TextStyle(fontSize: 20, color: subTextColor)),
                 ],
               ),
