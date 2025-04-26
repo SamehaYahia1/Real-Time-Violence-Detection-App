@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Pages/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_application_1/Pages/user_cameras_page.dart';
 
 class UserPage extends StatefulWidget {
   final String userName;
@@ -56,8 +57,33 @@ class _UserPageState extends State<UserPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Text('Welcome, ${widget.userName}!'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Welcome, ${widget.userName}!',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const UserCamerasPage()),
+                );
+              },
+              icon: const Icon(Icons.videocam),
+              label: const Text('View My Cameras'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
