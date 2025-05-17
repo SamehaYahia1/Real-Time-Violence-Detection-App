@@ -4,7 +4,7 @@ import 'package:flutter_application_1/Constant/colors.dart';
 import 'package:flutter_application_1/Constant/custom_padding_field.dart';
 import 'package:flutter_application_1/Constant/custom_password_field.dart';
 import 'package:flutter_application_1/Constant/custom_text_field.dart';
-import 'package:flutter_application_1/Pages/verification_screen.dart';
+import 'package:flutter_application_1/Pages/Start/verification_screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

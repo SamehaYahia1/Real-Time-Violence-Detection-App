@@ -25,6 +25,7 @@ class CustomTextField extends StatelessWidget {
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (value) =>
             value!.trim().isEmpty ? '$label is required' : null,
+        onChanged: onChanged,
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.white),
           labelText: label,

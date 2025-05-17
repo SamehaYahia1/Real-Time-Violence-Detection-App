@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/colors.dart';
-import 'package:flutter_application_1/Pages/choose_screen.dart';
-import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
+import 'package:flutter_application_1/Pages/Home/BottomBarScreen.dart';
+import 'package:flutter_application_1/Pages/Test/HomecctvScreen.dart';
+import 'package:flutter_application_1/Pages/Start/choose_screen.dart';
+import 'package:flutter_application_1/Pages/Test/UserOrAdminPage/user_or_admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -46,6 +48,10 @@ class _SplashScreenState extends State<SplashScreen>
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
     final userName = prefs.getString('user_name');
+    final userId = prefs.getString('user_id');
+    final subscriptionPlan = prefs.getString('subscription_plan');
+    final subscriptionPlanInt =
+        subscriptionPlan != null ? int.parse(subscriptionPlan) : null;
 
     if (!mounted) return;
 
@@ -53,7 +59,10 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => UserPage(userName: userName ?? "User"),
+          builder: (context) => Homeuserscreen(
+              userId: userId ?? "0",
+              username: userName ?? "unknown",
+              subscriptionPlan: subscriptionPlanInt ?? 0),
         ),
       );
     } else {

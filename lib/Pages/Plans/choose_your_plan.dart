@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
-import 'package:flutter_application_1/Pages/loading_screen.dart';
+import 'package:flutter_application_1/Pages/Plans/loading_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/Models/plan_model.dart';
@@ -106,7 +106,11 @@ class _ChoosePlanScreenState extends State<ChoosePlanScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => LoadingScreen(message: message),
+            builder: (_) => LoadingScreen(
+                userId: widget.userId,
+                userName: widget.userName,
+                message: message,
+                SubscriptionId: widget.SubscriptionId),
           ),
         );
       } else {
@@ -114,7 +118,10 @@ class _ChoosePlanScreenState extends State<ChoosePlanScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const LoadingScreen(
+            builder: (_) => LoadingScreen(
+                userName: widget.userName,
+                SubscriptionId: widget.SubscriptionId,
+                userId: '',
                 message: "Something went wrong. Please try again."),
           ),
         );
@@ -124,8 +131,11 @@ class _ChoosePlanScreenState extends State<ChoosePlanScreen>
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              LoadingScreen(message: "Something went wrong. Please try again."),
+          builder: (_) => LoadingScreen(
+              SubscriptionId: widget.SubscriptionId,
+              userName: widget.userName,
+              userId: '',
+              message: "Something went wrong. Please try again."),
         ),
       );
     }

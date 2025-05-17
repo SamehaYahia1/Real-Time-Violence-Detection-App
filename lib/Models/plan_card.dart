@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Pages/Home/BottomBarScreen.dart';
+import 'package:flutter_application_1/Pages/Test/HomecctvScreen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../Models/plan_model.dart';
-import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
+import 'package:flutter_application_1/Pages/Test/UserOrAdminPage/user_or_admin.dart';
 
 class PlanCard extends StatelessWidget {
   final PlanModel plan;
@@ -25,6 +27,9 @@ class PlanCard extends StatelessWidget {
     final subTextColor = isSelected ? Colors.white : Colors.blue[300];
     final cardColor = isSelected ? const Color(0xFF4196FD) : Colors.white;
     final iconColor = isSelected ? Colors.blue[900] : Colors.blue;
+    final String userId = "";
+    final String userName = "";
+    final String SubscriptionId = "";
 
     // Features to display
     final List<String> features = [
@@ -112,8 +117,11 @@ class PlanCard extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const UserPage(userName: 'User')),
+                                          builder: (context) => Homeuserscreen(
+                                              userId: userId,
+                                              username: userName,
+                                              subscriptionPlan:
+                                                  int.parse(SubscriptionId))),
                                     );
                                   },
                               style: ElevatedButton.styleFrom(

@@ -5,13 +5,14 @@ import 'package:flutter_application_1/Constant/custom_padding_field.dart';
 import 'package:flutter_application_1/Constant/custom_password_field.dart';
 import 'dart:convert';
 import 'package:flutter_application_1/Constant/token_handler.dart';
-import 'package:flutter_application_1/Pages/signup_screen.dart';
-import 'package:flutter_application_1/Pages/unknown_role.dart';
-import 'package:flutter_application_1/UserOrAdminPage/user_or_admin.dart';
+import 'package:flutter_application_1/Pages/Home/BottomBarScreen.dart';
+import 'package:flutter_application_1/Pages/Start/signup_screen.dart';
+import 'package:flutter_application_1/Pages/Start/unknown_role.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'choose_your_plan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Plans/choose_your_plan.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -79,6 +80,9 @@ class _LoginScreenState extends State<LoginScreen> {
           final nameClaim = decodedToken["name"];
           final userId = decodedToken[
               "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setString('userId', userId);
           final SubscriptionId = decodedToken["SubscriptionPlanId"];
           final userName = nameClaim is List ? nameClaim[0] : nameClaim;
           final subscriptionPlanIdInt = int.tryParse(SubscriptionId);
@@ -97,10 +101,11 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => UserPage(
-                    userName: userName,
-                  ),
-                ),
+                    builder: (_) => Homeuserscreen(
+                          username: userName,
+                          userId: userId,
+                          subscriptionPlan: int.parse(SubscriptionId),
+                        )),
               );
             } else {
               Navigator.pushReplacement(
