@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Pages/login_screen.dart';
-import 'package:flutter_application_1/Pages/signup_screen.dart';
+import 'package:flutter_application_1/Pages/Start/login_screen.dart';
+import 'package:flutter_application_1/Pages/Start/signup_screen.dart';
 
 class ChooseScreen extends StatelessWidget {
   const ChooseScreen({super.key});
