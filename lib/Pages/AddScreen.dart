@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Cameras/camera_discovery_service.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -10,6 +11,7 @@ class AddScreen extends StatefulWidget {
 
 class _AddScreenState extends State<AddScreen> {
   bool isLoading = false;
+  //String loadingMessage = "Discovering your camera, please wait...";
 
   void handleDiscoverCamera() async {
     setState(() => isLoading = true);
@@ -19,13 +21,28 @@ class _AddScreenState extends State<AddScreen> {
 
     setState(() => isLoading = false);
 
-    if (result != null) {
+    if (result != null && result.containsKey('error')) {
+      // Show backend error (e.g., status 500: already added)
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text("Camera ${result['cameraName']} added successfully!")),
+        SnackBar(content: Text(result['error']!)),
+      );
+    } else if (result != null && result.containsKey('cameraName')) {
+      // Success: show success dialog
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Success"),
+          content: Text("Camera ${result['cameraName']} added successfully!"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            )
+          ],
+        ),
       );
     } else {
+      // Unknown or unexpected failure
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Camera discovery or saving failed.")),
       );
@@ -39,15 +56,38 @@ class _AddScreenState extends State<AddScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
         elevation: 0,
-        title: const Text("Please Add Your Camera",
-            style: TextStyle(fontSize: 20, color: Colors.white)),
+        title: const Text(
+          "Please Add Your Camera",
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: isLoading
-              ? const CircularProgressIndicator()
-              : Card(
+      body: Center(
+        child: isLoading
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LoadingAnimationWidget.staggeredDotsWave(
+                    color: Color.fromARGB(255, 60, 90, 118),
+                    size: 80,
+                  ),
+                  const SizedBox(height: 24),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  //   child: Text(
+                  //     loadingMessage,
+                  //     textAlign: TextAlign.center,
+                  //     style: const TextStyle(
+                  //       fontSize: 20,
+                  //       fontWeight: FontWeight.bold,
+                  //       color: Colors.black87,
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              )
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
@@ -65,7 +105,7 @@ class _AddScreenState extends State<AddScreen> {
                     ),
                   ),
                 ),
-        ),
+              ),
       ),
     );
   }
