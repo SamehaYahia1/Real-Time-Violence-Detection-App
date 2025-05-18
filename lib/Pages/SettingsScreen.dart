@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Pages/login_screen.dart';
+import 'package:flutter_application_1/Pages/Start/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserPage extends StatefulWidget {
-  final String userName;
-  const UserPage({super.key, required this.userName});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<UserPage> createState() => _UserPageState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _logout() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -46,8 +45,10 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE9F0FF),
       appBar: AppBar(
-        title: const Text('User Page'),
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -55,9 +56,13 @@ class _UserPageState extends State<UserPage> {
             onPressed: _logout,
           ),
         ],
-      ),
-      body: Center(
-        child: Text('Welcome, ${widget.userName}!'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text("Your Settings",
+                style: TextStyle(fontSize: 20, color: Colors.white)),
+          ],
+        ),
       ),
     );
   }
