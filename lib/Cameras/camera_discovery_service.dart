@@ -41,12 +41,16 @@ class CameraDiscoveryService {
             'cameraName': cameraName,
             'streamUrl': rtspUrl,
           };
+        } else if (response.statusCode == 500) {
+          return {'error': 'You have already added this camera.'};
         } else {
           print('Failed to add camera: ${response.body}');
+          return {'error': 'Failed to add camera'};
         }
       }
     } catch (e) {
       print('Discovery error: $e');
+      return {'error': 'Camera discovery failed'};
     }
     return null;
   }

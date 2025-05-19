@@ -7,11 +7,10 @@ import 'package:flutter_application_1/Camera/CameraDisplayScreen.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
 import 'package:flutter_application_1/Constant/token_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class CameraListScreen extends StatefulWidget {
-  const CameraListScreen({
-    Key? key,
-  }) : super(key: key);
+  const CameraListScreen({Key? key}) : super(key: key);
 
   @override
   State<CameraListScreen> createState() => _CameraListScreenState();
@@ -74,7 +73,30 @@ class _CameraListScreenState extends State<CameraListScreen> {
             const Text("Your Cameras", style: TextStyle(color: Colors.white)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LoadingAnimationWidget.staggeredDotsWave(
+                    color: Color.fromARGB(255, 60, 90, 118),
+                    size: 80,
+                  ),
+                  const SizedBox(height: 24),
+                  // const Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: 24.0),
+                  //   child: Text(
+                  //     "Fetching your cameras, please wait...",
+                  //     textAlign: TextAlign.center,
+                  //     style: TextStyle(
+                  //       fontSize: 20,
+                  //       fontWeight: FontWeight.bold,
+                  //       color: Colors.black87,
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+            )
           : _cameras.isEmpty
               ? const Center(child: Text("No cameras found."))
               : ListView.builder(
