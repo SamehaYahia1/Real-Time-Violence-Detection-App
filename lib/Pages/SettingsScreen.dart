@@ -14,16 +14,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to log out?'),
+        backgroundColor: const Color(0xFFBFD7ED),
+        title: const Text('Logout',
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            )),
+        content: const Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(fontSize: 18),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Cancel',
+                style: TextStyle(color: Colors.black, fontSize: 16)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Logout'),
+            child: const Text('Logout',
+                style: TextStyle(color: Colors.red, fontSize: 16)),
           ),
         ],
       ),
@@ -46,21 +57,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE9F0FF),
-      appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: _logout,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("Assets/images/camera_bg.png"),
+            fit: BoxFit.scaleDown,
+            alignment: Alignment(0, 0.15),
+            colorFilter: ColorFilter.mode(
+              Color(0xFFE9F0FF),
+              BlendMode.dstATop,
+            ),
           ),
-        ],
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text("Your Settings",
-                style: TextStyle(fontSize: 20, color: Colors.white)),
+        ),
+        child: Column(
+          children: [
+            PreferredSize(
+              preferredSize: const Size.fromHeight(50),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(30),
+                ),
+                child: AppBar(
+                  backgroundColor: const Color(0xFFBFD7ED),
+                  elevation: 4,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.black87),
+                      tooltip: 'Logout',
+                      onPressed: _logout,
+                    ),
+                  ],
+                  shadowColor: Colors.black26,
+                  automaticallyImplyLeading: false,
+                  title: const Row(
+                    children: [
+                      Icon(Icons.settings, color: Colors.black87),
+                      SizedBox(width: 10),
+                      Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  "add your settings here",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
