@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Cameras/camera_discovery_service.dart';
-import 'package:flutter_application_1/Constant/colors.dart';
+import 'package:flutter_application_1/Constant/ShowErrorToSnackBar.dart';
+import 'package:flutter_application_1/Constant/api_endpoint.dart';
+import 'package:flutter_application_1/Constant/custom_textfieldAdd.dart';
+import 'package:flutter_application_1/Constant/token_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'dart:math' as math;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -13,69 +15,78 @@ class AddScreen extends StatefulWidget {
 }
 
 class _AddScreenState extends State<AddScreen> {
-  bool isLoading = false;
-  final _formKey = GlobalKey<FormState>();
-
   // Controller for text fields
-  final TextEditingController _nameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); //used for validation
+  final TextEditingController _cameraNameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController = TextEditingController();
-
+  bool _isSubmitting = false; //Tracks whether the camera is being submitted.
   String _selectedStream = 'stream1';
   final List<String> _streamOptions = ['stream1', 'profile1', 'profile0'];
 
+  Future<void> _submitCameraData() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+    String ip = _ipController.text.trim();
+    String port = _portController.text.trim();
+    String cameraName = _cameraNameController.text.trim();
+    final path = _selectedStream.trim().replaceAll(RegExp(r'^/+'), '');
+
+    String rtspUrl = 'rtsp://$username:$password@$ip:$port/$path';
+    final token = await TokenHandler().getToken();
+    if (token == null) {
+      showErrorTopSnackBar(context, "Token is missing. Please login.");
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiEndpoints.baseUrl}/api/Camera/add'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'cameraName': cameraName,
+          'streamUrl': rtspUrl,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        showErrorTopSnackBar(
+            context, " $cameraName✅Camera added successfully.");
+      } else if (response.statusCode == 500) {
+        showErrorTopSnackBar(context, "⚠️ Camera already exists.");
+      } else {
+        showErrorTopSnackBar(
+            context, "❌ Failed to add camera: ${response.body}");
+      }
+    } catch (e) {
+      showErrorTopSnackBar(context, "❌ Error: $e");
+    }
+
+    setState(() => _isSubmitting = false);
+  }
+
   @override
   void dispose() {
-    // Clean up the controllers when the widget is disposed
-    _nameController.dispose();
+    _cameraNameController.dispose();
     _locationController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _ipController.dispose();
     _portController.dispose();
     super.dispose();
-  }
-
-  Future<void> handleAddCamera() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() => isLoading = true);
-
-    // Create camera data map
-    final cameraData = {
-      'name': _nameController.text,
-      'location': _locationController.text,
-      'username': _usernameController.text,
-      'password': _passwordController.text,
-      'ip': _ipController.text,
-      'port': _portController.text,
-      'streamProfile': _selectedStream,
-    };
-
-    // Here you would typically send this data to your backend
-    // For now, we'll simulate a successful response
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() => isLoading = false);
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Success"),
-        content: Text("Camera ${_nameController.text} added successfully!"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
-          )
-        ],
-      ),
-    );
   }
 
   @override
@@ -141,68 +152,20 @@ class _AddScreenState extends State<AddScreen> {
                   child: Column(
                     children: [
                       // Camera Name
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: 'Camera Name',
-                          focusColor: Colors.black,
-                          prefixIcon: Icon(
-                            Icons.camera_alt,
-                            color: const Color.fromARGB(255, 70, 133, 193),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color.fromARGB(
-                                  255, 70, 133, 193), // Your custom color
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a camera name';
-                          }
-                          return null;
-                        },
+                      CustomTextFieldAdd(
+                        controller: _cameraNameController,
+                        label: 'Username',
+                        icon: Icons.person,
                       ),
                       const SizedBox(height: 15),
 
                       // Camera Location
-                      TextFormField(
+                      CustomTextFieldAdd(
                         controller: _locationController,
-                        decoration: InputDecoration(
-                          labelText: 'Camera Location',
-                          prefixIcon: Icon(
-                            Icons.location_on,
-                            color: const Color.fromARGB(255, 70, 133, 193),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color.fromARGB(
-                                  255, 70, 133, 193), // Your custom color
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a location';
-                          }
-                          return null;
-                        },
+                        label: 'Camera Location',
+                        icon: Icons.location_on,
                       ),
+
                       const SizedBox(height: 20),
 
                       // Camera Information Section
@@ -224,155 +187,53 @@ class _AddScreenState extends State<AddScreen> {
                         child: const Text(
                           'Camera Connection Information',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: Color.fromARGB(255, 1, 4, 146),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 15),
-
-                      // Username
-                      TextFormField(
+                      // // Username
+                      CustomTextFieldAdd(
                         controller: _usernameController,
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          prefixIcon: Icon(
-                            Icons.person,
-                            color: const Color.fromARGB(255, 70, 133, 193),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color.fromARGB(
-                                  255, 70, 133, 193), // Your custom color
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a username';
-                          }
-                          return null;
-                        },
+                        label: 'Username',
+                        icon: Icons.person,
+                        isPassword: false,
                       ),
-
                       const SizedBox(height: 15),
-
                       // Password
-                      TextFormField(
+                      CustomTextFieldAdd(
                         controller: _passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(
-                            Icons.lock,
-                            color: Color.fromARGB(255, 70, 133, 193),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromARGB(255, 70, 133, 193),
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a password';
-                          }
-                          return null;
-                        },
+                        label: 'Password',
+                        icon: Icons.lock,
+                        isPassword: true,
                       ),
-
                       const SizedBox(height: 15),
-
                       // IP Address
-                      TextFormField(
+                      CustomTextFieldAdd(
                         controller: _ipController,
+                        label: 'IP Address',
+                        icon: Icons.language,
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'IP Address',
-                          prefixIcon: Icon(
-                            Icons.language,
-                            color: const Color.fromARGB(255, 70, 133, 193),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromARGB(
-                                  255, 70, 133, 193), // Your custom color
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter an IP address';
-                          }
-                          return null;
-                        },
                       ),
                       const SizedBox(height: 15),
-
                       // Port
-                      TextFormField(
+                      CustomTextFieldAdd(
                         controller: _portController,
+                        label: 'Port',
+                        icon: Icons.settings_ethernet,
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Port',
-                          prefixIcon: Icon(
-                            Icons.settings_ethernet,
-                            color: const Color.fromARGB(255, 70, 133, 193),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color.fromARGB(
-                                  255, 70, 133, 193), // Your custom color
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a port number';
-                          }
-                          return null;
-                        },
                       ),
-                      // const SizedBox(height: 30),
                       const SizedBox(height: 15),
-
                       DropdownButtonFormField<String>(
                         value: _selectedStream,
                         decoration: InputDecoration(
+                          isDense: true,
                           labelText: 'Choose Your Stream Type',
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.video_settings,
-                            color: const Color.fromARGB(255, 70, 133, 193),
+                            color: Color.fromARGB(255, 70, 133, 193),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -420,16 +281,15 @@ class _AddScreenState extends State<AddScreen> {
                       ),
 
                       const SizedBox(height: 15),
-
                       // Add Camera Button
-                      if (isLoading)
+                      if (_isSubmitting)
                         LoadingAnimationWidget.staggeredDotsWave(
                           color: const Color.fromARGB(255, 60, 90, 118),
                           size: 60,
                         )
                       else
                         GestureDetector(
-                          onTap: handleAddCamera,
+                          onTap: _submitCameraData,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),

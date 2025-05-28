@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Models/camera_model.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_application_1/Camera/CameraCard.dart';
 import 'package:flutter_application_1/Camera/CameraDisplayScreen.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
 import 'package:flutter_application_1/Constant/token_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CameraListScreen extends StatefulWidget {
   const CameraListScreen({Key? key}) : super(key: key);
@@ -19,6 +19,7 @@ class CameraListScreen extends StatefulWidget {
 class _CameraListScreenState extends State<CameraListScreen> {
   List<CameraModel> _cameras = [];
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -34,6 +35,10 @@ class _CameraListScreenState extends State<CameraListScreen> {
     print('User ID: $userId');
     if (token == null || userId == null) {
       print('Missing token.');
+      setState(() {
+        _isLoading = false;
+        _hasError = true; // Show error if no token/userId
+      });
       return;
     }
 
@@ -55,11 +60,21 @@ class _CameraListScreenState extends State<CameraListScreen> {
       setState(() {
         _cameras = loadedCameras;
         _isLoading = false;
+        _hasError = false;
       });
     } else {
-      print('Failed to load cameras: ${response.body}');
-      setState(() => _isLoading = false);
+      print(
+          'Failed to load cameras: ${response.statusCode} - ${response.body}');
+      setState(() {
+        _isLoading = false;
+        _hasError = response.statusCode == 500; // Specific to your backend
+      });
     }
+
+    // } else {
+    //   print('Failed to load cameras: ${response.body}');
+    //   setState(() => _isLoading = false);
+    // }
   }
 
   @override
@@ -122,7 +137,7 @@ class _CameraListScreenState extends State<CameraListScreen> {
                         ],
                       ),
                     )
-                  : _cameras.isEmpty
+                  : _hasError || _cameras.isEmpty
                       ? const Center(
                           child: Text("No cameras found.",
                               style:
