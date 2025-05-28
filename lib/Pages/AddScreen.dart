@@ -26,7 +26,7 @@ class _AddScreenState extends State<AddScreen> {
   bool _isSubmitting = false; //Tracks whether the camera is being submitted.
   String _selectedStream = 'stream1';
   final List<String> _streamOptions = ['stream1', 'profile1', 'profile0'];
-
+//A7A
   Future<void> _submitCameraData() async {
     if (!_formKey.currentState!.validate()) return;
 
