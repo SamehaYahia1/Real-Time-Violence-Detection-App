@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Cameras/camera_discovery_service.dart';
+import 'package:flutter_application_1/Pages/Test/Cameras/camera_discovery_service.dart';
 import 'package:flutter_application_1/Constant/colors.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -224,7 +224,7 @@ class _AddScreenState extends State<AddScreen> {
                         child: const Text(
                           'Camera Connection Information',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: Color.fromARGB(255, 1, 4, 146),
                           ),
