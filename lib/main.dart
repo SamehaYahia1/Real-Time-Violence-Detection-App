@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Pages/Home/BottomBarScreen.dart';
-import 'package:flutter_application_1/Pages/NotifiSettings.dart';
 import 'package:flutter_application_1/Pages/Start/choose_screen.dart';
 import 'package:flutter_application_1/Pages/Start/login_screen.dart';
 import 'package:flutter_application_1/Pages/Start/signup_screen.dart';
@@ -9,9 +8,9 @@ import 'package:flutter_application_1/Pages/Plans/choose_your_plan.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  NotifiSettings().initNotification();
   runApp(const MyApp());
 }
+//yarab
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

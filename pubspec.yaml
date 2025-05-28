@@ -48,21 +48,13 @@ dependencies:
   flutter_vlc_player: ^7.4.2
   curved_navigation_bar: ^1.0.6
   top_snackbar_flutter: ^3.2.0
-  flutter_local_notifications: ^19.2.1
- 
+
   
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_launcher_icons: "^0.14.3"
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "Assets/images/app_icon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
