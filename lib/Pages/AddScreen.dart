@@ -139,7 +139,7 @@ class _AddScreenState extends State<AddScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 0),
               child: Image.asset(
-                'Assets/images/camer_logo.png',
+                'Assets/images/camera_logo.png',
                 height: 150,
               ),
             ),
@@ -154,7 +154,7 @@ class _AddScreenState extends State<AddScreen> {
                       // Camera Name
                       CustomTextFieldAdd(
                         controller: _cameraNameController,
-                        label: 'Username',
+                        label: 'Camera Name',
                         icon: Icons.person,
                       ),
                       const SizedBox(height: 15),
@@ -226,59 +226,71 @@ class _AddScreenState extends State<AddScreen> {
                         keyboardType: TextInputType.number,
                       ),
                       const SizedBox(height: 15),
-                      DropdownButtonFormField<String>(
-                        value: _selectedStream,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          labelText: 'Choose Your Stream Type',
-                          prefixIcon: const Icon(
-                            Icons.video_settings,
-                            color: Color.fromARGB(255, 70, 133, 193),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1,
                           ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color.fromARGB(255, 70, 133, 193),
-                              width: 2,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
                         ),
-                        dropdownColor: Colors.white,
-                        icon: const Icon(Icons.arrow_drop_down,
-                            color: Color.fromARGB(255, 70, 133, 193)),
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontSize: 16,
-                        ),
-                        items: _streamOptions.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: const TextStyle(
-                                color: Color.fromARGB(255, 33, 63, 104),
-                                fontWeight: FontWeight.w500,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.video_settings,
+                                color: Color.fromARGB(255, 70, 133, 193)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: DropdownButton<String>(
+                                value: _selectedStream,
+                                underline: Container(),
+                                icon: const Icon(Icons.arrow_drop_down,
+                                    color: Colors.black87),
+                                iconSize: 24,
+                                dropdownColor: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                                hint: const Text(
+                                  'Choose Your Stream Type',
+                                  style: TextStyle(
+                                      color: Colors.blue, fontSize: 16),
+                                ),
+                                items: _streamOptions.map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Text(
+                                        value,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color:
+                                              Color.fromARGB(255, 33, 63, 104),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      _selectedStream = newValue;
+                                    });
+                                  }
+                                },
+                                isExpanded: true,
                               ),
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedStream = newValue!;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value == value.isEmpty) {
-                            return 'Please select a valid stream type';
-                          }
-                          return null;
-                        },
+                          ],
+                        ),
                       ),
+                      const SizedBox(height: 15),
 
                       const SizedBox(height: 15),
                       // Add Camera Button

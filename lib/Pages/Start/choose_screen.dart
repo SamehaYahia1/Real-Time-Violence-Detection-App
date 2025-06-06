@@ -15,7 +15,7 @@ class ChooseScreen extends StatelessWidget {
             decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [
                 Color(0xFF1B7CA6),
-                Color(0xff100e48),
+                Color.fromARGB(255, 47, 42, 203),
               ]),
             ),
           ),
@@ -25,18 +25,16 @@ class ChooseScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 150),
 
                   Stack(
                     children: [
                       SizedBox(
-                        height: 240,
+                        height: 100,
                         width: double.infinity,
                         child: Stack(
                           children: [
-                            Positioned(
-                              top: 130,
-                              left: 150,
+                            Center(
                               child: Image.asset(
                                 'Assets/images/Logo.png',
                                 width: 130,
@@ -47,9 +45,10 @@ class ChooseScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
                   const Center(
                     child: Text(
-                      '  VDECT.',
+                      '    VDECT.',
                       style: TextStyle(
                         color: Color(0xFF100F23),
                         fontSize: 20,
@@ -66,7 +65,7 @@ class ChooseScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 230),
+                        const SizedBox(height: 150),
                         // Login button
                         SizedBox(
                           width: double.infinity,
