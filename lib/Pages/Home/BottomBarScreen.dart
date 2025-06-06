@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter_application_1/Pages/AddScreen.dart';
 import 'package:flutter_application_1/Pages/Home/List_Of_Cameras.dart';
-import 'package:flutter_application_1/Pages/NotificationScreen.dart';
-import 'package:flutter_application_1/Pages/RecordsScreen.dart';
+import 'package:flutter_application_1/Pages/Notifactions/NotificationScreen.dart';
+import 'package:flutter_application_1/Pages/Recoreds/RecordsScreen.dart';
 import 'package:flutter_application_1/Pages/SettingsScreen.dart';
 
 class Homeuserscreen extends StatefulWidget {
   final String userId;
   final String username;
   final int subscriptionPlan;
-  const Homeuserscreen(
-      {super.key,
-      required this.userId,
-      required this.username,
-      required this.subscriptionPlan});
+  const Homeuserscreen({
+    super.key,
+    required this.userId,
+    required this.username,
+    required this.subscriptionPlan,
+  });
 
   @override
   State<Homeuserscreen> createState() => _HomeuserscreenState();

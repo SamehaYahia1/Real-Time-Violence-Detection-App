@@ -149,6 +149,8 @@ class _CameraListScreenState extends State<CameraListScreen> {
                             final camera = _cameras[index];
                             return CameraCard(
                               cameraName: camera.cameraName,
+                              location: "Home",
+                              isOnline: true,
                               onTap: () {
                                 Navigator.push(
                                   context,

@@ -162,8 +162,8 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(colors: [
-                colors.secondaryColor2,
-                colors.secondaryBackgroundColor,
+                colors.backgroundColor,
+                colors.secondaryBackgroundColor
               ]),
             ),
           ),
@@ -203,8 +203,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'LOGIN TO\nYOUR ACCOUNT',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    // fontWeight: FontWeight.bold,
+                                    // fontStyle: FontStyle.italic,
                                     color: colors.secondaryColor,
                                   ),
                                 ),
@@ -218,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF100F23),
+                      color: colors.contColor,
                       borderRadius: BorderRadius.all(Radius.circular(40)),
                     ),
                     padding: const EdgeInsets.symmetric(

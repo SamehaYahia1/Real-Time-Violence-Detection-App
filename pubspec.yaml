@@ -48,20 +48,29 @@ dependencies:
   flutter_vlc_player: ^7.4.2
   curved_navigation_bar: ^1.0.6
   top_snackbar_flutter: ^3.2.0
-
+  flutter_local_notifications: ^19.2.1
+  firebase_core: ^3.13.1
+  firebase_messaging: ^15.2.6
   
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
+  flutter_lints: ^3.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "Assets/images/app_icon.png" 
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  # flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -83,10 +92,12 @@ flutter:
     - Assets/images/rightApp.PNG
     - Assets/images/background.png
     - Assets/images/background2.png
-    - Assets/images/image-removebg-preview (1).png
     - Assets/images/camera_bg.png
-    - Assets/images/camer_logo.png
-    
+    - Assets/images/camera_logo.png
+    - Assets/images/camera.png
+    - Assets/images/recording.png 
+    - Assets/images/image.jpeg
+    - Assets/images/cctv-camera.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
