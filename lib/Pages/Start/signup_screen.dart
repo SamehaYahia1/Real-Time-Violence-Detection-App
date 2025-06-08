@@ -4,6 +4,7 @@ import 'package:flutter_application_1/Constant/colors.dart';
 import 'package:flutter_application_1/Constant/custom_padding_field.dart';
 import 'package:flutter_application_1/Constant/custom_password_field.dart';
 import 'package:flutter_application_1/Constant/custom_text_field.dart';
+import 'package:flutter_application_1/Pages/Start/login_screen.dart';
 import 'package:flutter_application_1/Pages/Start/verification_screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
@@ -161,8 +162,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   colors.backgroundColor,
                   colors.secondaryBackgroundColor
                 ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                // begin: Alignment.topCenter,
+                // end: Alignment.bottomCenter,
               ),
             ),
           ),
@@ -196,8 +197,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               child: Text(
                                 'NEW ACCOUNT',
                                 style: TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    // fontWeight: FontWeight.bold,
                                     color: colors.secondaryColor),
                               ),
                             ),
@@ -347,7 +348,14 @@ class _SignupScreenState extends State<SignupScreen> {
                               const Text("Already have an account?",
                                   style: TextStyle(color: colors.textColor)),
                               TextButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LoginScreen()),
+                                  );
+                                },
                                 child: const Text('Sign In',
                                     style: TextStyle(
                                         color: colors.secondaryColor2)),
