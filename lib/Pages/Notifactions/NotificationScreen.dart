@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
 // import 'package:flutter_application_1/FirebaseApi.dart'; // import the global list
 
 class NotificationsScreen extends StatefulWidget {
   NotificationsScreen({super.key});
-  List<RemoteMessage> notificationList = [];
-  ValueNotifier<int> notificationCounter = ValueNotifier<int>(0);
 
   static const route = '/notifications-screen';
 
@@ -15,12 +12,24 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  late VoidCallback _notificationListener;
+
   @override
   void initState() {
     super.initState();
-    notificationCounter.addListener(() {
+
+    _notificationListener = () {
+      if (!mounted) return;
       setState(() {});
-    });
+    };
+
+    notificationCounter.addListener(_notificationListener);
+  }
+
+  @override
+  void dispose() {
+    notificationCounter.removeListener(_notificationListener);
+    super.dispose();
   }
 
   @override
@@ -47,26 +56,51 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         ),
       ),
-      body: ListView.builder(
-        itemCount: notificationList.length,
-        itemBuilder: (context, index) {
-          final message = notificationList[notificationList.length - 1 - index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              leading: const Icon(Icons.notification_important),
-              title: Text(message.notification?.title ?? "No Title"),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(message.notification?.body ?? "No Body"),
-                  Text(message.sentTime?.toString() ?? "No Time",
-                      style: const TextStyle(fontSize: 12)),
-                ],
-              ),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("Assets/images/camera_bg.png"),
+            fit: BoxFit.scaleDown,
+            alignment: Alignment(0, 0.15),
+            colorFilter: ColorFilter.mode(
+              Color(0xFFE9F0FF),
+              BlendMode.dstATop,
             ),
-          );
-        },
+          ),
+        ),
+        child: ListView.builder(
+          itemCount: notificationList.length,
+          itemBuilder: (context, index) {
+            final message =
+                notificationList[notificationList.length - 1 - index];
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ListTile(
+                onTap: () {},
+                leading: const Icon(Icons.notification_important),
+                title: Text(message.notification?.title ?? "No Title"),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(message.notification?.body ?? "No Body"),
+                    Text(
+                      message.sentTime?.toString() ?? "No Time",
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+                // trailing: IconButton(
+                //   icon: const Icon(Icons.delete),
+                //   onPressed: () {
+                //     setState(() {
+                //       notificationList.removeAt(index);
+                //     });
+                //   },
+                // ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -77,6 +111,7 @@ class FirebaseNotificationHandler {
   static Function(String title, String body, String time)?
       onNotificationReceived;
 }
+/////anaaaaaaaaaa////
 
 
 
