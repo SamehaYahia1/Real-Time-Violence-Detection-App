@@ -6,6 +6,7 @@ import 'package:flutter_application_1/Constant/custom_password_field.dart';
 import 'dart:convert';
 import 'package:flutter_application_1/Constant/token_handler.dart';
 import 'package:flutter_application_1/Pages/Home/BottomBarScreen.dart';
+import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
 import 'package:flutter_application_1/Pages/Start/signup_screen.dart';
 import 'package:flutter_application_1/Pages/Start/unknown_role.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -83,6 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
           await prefs.setString('userId', userId);
+          await loadNotificationsFromFirestore();
+          notificationCounter.value = notificationList.length;
           final SubscriptionId = decodedToken["SubscriptionPlanId"];
           final userName = nameClaim is List ? nameClaim[0] : nameClaim;
           final subscriptionPlanIdInt = int.tryParse(SubscriptionId);

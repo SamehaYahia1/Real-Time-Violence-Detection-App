@@ -24,6 +24,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     };
 
     notificationCounter.addListener(_notificationListener);
+    loadNotificationsFromFirestore().then((_) {
+      setState(() {}); // refresh UI after loading
+    });
   }
 
   @override
@@ -78,13 +81,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: ListTile(
                 onTap: () {},
                 leading: const Icon(Icons.notification_important),
-                title: Text(message.notification?.title ?? "No Title"),
+                title: Text(message.title ?? "No Title"),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(message.notification?.body ?? "No Body"),
+                    Text(message.body ?? "No Body"),
                     Text(
-                      message.sentTime?.toString() ?? "No Time",
+                      formatTimestamp(message.timestamp),
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
@@ -104,6 +107,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
+}
+
+String formatTimestamp(DateTime? timestamp) {
+  if (timestamp == null) return "No Time";
+  return "${timestamp.day}/${timestamp.month}/${timestamp.year} ${timestamp.hour}:${timestamp.minute}";
 }
 
 // Global callback class

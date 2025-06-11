@@ -10,11 +10,14 @@ class Homeuserscreen extends StatefulWidget {
   final String userId;
   final String username;
   final int subscriptionPlan;
+  final String initialTab; // <-- NEW optional param with default
+
   const Homeuserscreen({
     super.key,
     required this.userId,
     required this.username,
     required this.subscriptionPlan,
+    this.initialTab = 'home', // <-- Default tab
   });
 
   @override
@@ -22,7 +25,7 @@ class Homeuserscreen extends StatefulWidget {
 }
 
 class _HomeuserscreenState extends State<Homeuserscreen> {
-  int index = 2; // Initial index to show the first screen
+  late int index;
   final items = const <Widget>[
     Icon(Icons.add, size: 30, color: Colors.black),
     Icon(Icons.videocam, size: 30, color: Colors.black),
@@ -30,10 +33,34 @@ class _HomeuserscreenState extends State<Homeuserscreen> {
     Icon(Icons.notifications, size: 30, color: Colors.black),
     Icon(Icons.settings, size: 30, color: Colors.black),
   ];
+
   late final List<Widget> _screens;
+
   @override
   void initState() {
     super.initState();
+
+    // Choose index based on tab name
+    switch (widget.initialTab) {
+      case 'add':
+        index = 0;
+        break;
+      case 'records':
+        index = 1;
+        break;
+      case 'home':
+        index = 2;
+        break;
+      case 'notifications':
+        index = 3;
+        break;
+      case 'settings':
+        index = 4;
+        break;
+      default:
+        index = 2;
+    }
+
     _screens = [
       AddScreen(),
       VideoScreen(),
@@ -47,8 +74,7 @@ class _HomeuserscreenState extends State<Homeuserscreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE9F0FF),
-      body: _screens[index], // Display the screen based on the selected index
-
+      body: _screens[index],
       bottomNavigationBar: CurvedNavigationBar(
         animationDuration: const Duration(milliseconds: 400),
         height: 60,
@@ -58,7 +84,7 @@ class _HomeuserscreenState extends State<Homeuserscreen> {
         index: index,
         onTap: (index) {
           setState(() {
-            this.index = index; // Update the current index
+            this.index = index;
           });
         },
       ),
