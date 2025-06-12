@@ -4,10 +4,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_application_1/Pages/Notifactions/NotificationScreen.dart';
 import 'package:flutter_application_1/main.dart';
 
-//create a custom class to hold notification details
 class AppNotification {
   final String title;
   final String body;
@@ -20,12 +20,9 @@ class AppNotification {
   });
 }
 
-// Global state
-List<AppNotification> notificationList = []; // all notifications stored here
-ValueNotifier<int> notificationCounter =
-    ValueNotifier<int>(0); // Tracks how many notifications you have
+List<AppNotification> notificationList = [];
+ValueNotifier<int> notificationCounter = ValueNotifier<int>(0);
 
-//when the app is closed and you receive a notification
 @pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   await saveNotificationToFirestore(message);
@@ -54,6 +51,10 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
     print("Firebase Messaging Token: $fCMToken");
+
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+    );
 
     await loadNotificationsFromFirestore();
     await _initLocalNotifications();
@@ -89,8 +90,6 @@ class FirebaseApi {
       sound: true,
     );
 
-    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
-
     FirebaseMessaging.onMessage.listen((message) async {
       await saveNotificationToFirestore(message);
 
@@ -115,30 +114,62 @@ class FirebaseApi {
       );
     });
 
-    _firebaseMessaging.getInitialMessage().then(handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen((message) async {
+      await saveNotificationToFirestore(message);
+      handleMessage(message);
+    });
+
+    RemoteMessage? initialMessage =
+        await _firebaseMessaging.getInitialMessage();
+    if (initialMessage != null) {
+      await saveNotificationToFirestore(initialMessage);
+      handleMessage(initialMessage);
+    }
+
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   }
 }
 
+Future<bool> isConnected() async {
+  var connectivityResult = await Connectivity().checkConnectivity();
+  return connectivityResult != ConnectivityResult.none;
+}
+
 Future<void> saveNotificationToFirestore(RemoteMessage message) async {
+  if (!await isConnected()) {
+    print('⚠️ No internet connection. Skipping Firestore save.');
+    return;
+  }
+
   final prefs = await SharedPreferences.getInstance();
   final userId = prefs.getString('userId');
   if (userId == null) return;
 
-  final docId = DateTime.now().millisecondsSinceEpoch.toString();
+  final docId =
+      message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-  await FirebaseFirestore.instance
+  final userNotificationsRef = FirebaseFirestore.instance
       .collection('notifications')
       .doc(userId)
       .collection('items')
-      .doc(docId)
-      .set({
-    'title': message.notification?.title ?? 'No Title',
-    'body': message.notification?.body ?? 'No Body',
-    'timestamp': FieldValue.serverTimestamp(),
-  });
+      .doc(docId);
 
-  // Add to local list immediately
+  try {
+    final existing = await userNotificationsRef.get();
+    if (existing.exists) {
+      print('Notification already saved, skipping duplicate.');
+      return;
+    }
+
+    await userNotificationsRef.set({
+      'title': message.notification?.title ?? 'No Title',
+      'body': message.notification?.body ?? 'No Body',
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  } catch (e) {
+    print('🔥 Error saving notification: $e');
+  }
+
   notificationList.insert(
     0,
     AppNotification(
@@ -155,22 +186,26 @@ Future<void> loadNotificationsFromFirestore() async {
   final userId = prefs.getString('userId');
   if (userId == null) return;
 
-  final snapshot = await FirebaseFirestore.instance
-      .collection('notifications')
-      .doc(userId)
-      .collection('items')
-      .orderBy('timestamp')
-      .get();
+  try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(userId)
+        .collection('items')
+        .orderBy('timestamp')
+        .get();
 
-  notificationList = snapshot.docs.map((doc) {
-    final data = doc.data();
-    final timestamp = data['timestamp'] as Timestamp?;
-    return AppNotification(
-      title: data['title'] ?? 'No Title',
-      body: data['body'] ?? 'No Body',
-      timestamp: timestamp?.toDate(),
-    );
-  }).toList();
+    notificationList = snapshot.docs.map((doc) {
+      final data = doc.data();
+      final timestamp = data['timestamp'] as Timestamp?;
+      return AppNotification(
+        title: data['title'] ?? 'No Title',
+        body: data['body'] ?? 'No Body',
+        timestamp: timestamp?.toDate(),
+      );
+    }).toList();
 
-  notificationCounter.value = notificationList.length;
+    notificationCounter.value = notificationList.length;
+  } catch (e) {
+    print('🔥 Error loading notifications: $e');
+  }
 }
