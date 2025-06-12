@@ -4,6 +4,7 @@ import 'package:flutter_application_1/Constant/settings/Custom_About.dart';
 import 'package:flutter_application_1/Constant/settings/Section_Card.dart';
 import 'package:flutter_application_1/Constant/settings/settings_widgets.dart.dart';
 import 'package:flutter_application_1/Constant/token_handler.dart';
+import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
 import 'package:flutter_application_1/Pages/Start/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -97,6 +98,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (confirmed ?? false) {
+      notificationList.clear();
+      notificationCounter.value = 0;
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('jwt_token');
 
