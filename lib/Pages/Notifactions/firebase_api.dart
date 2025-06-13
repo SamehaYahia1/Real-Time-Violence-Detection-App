@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_application_1/Pages/Notifactions/NotificationScreen.dart';
 import 'package:flutter_application_1/main.dart';
 
 class AppNotification {
@@ -89,6 +88,37 @@ class FirebaseApi {
       badge: true,
       sound: true,
     );
+//     FirebaseMessaging.onMessage.listen((message) async {
+//   await saveNotificationToFirestore(message); // Always save to Firestore
+
+//   final prefs = await SharedPreferences.getInstance();
+//   final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+
+//   if (!notificationsEnabled) {
+//     print('🔕 Notifications are disabled — not showing locally.');
+//     return; // Do not show local notification
+//   }
+
+//   final notification = message.notification;
+//   if (notification == null) return;
+
+//   _localNotifications.show(
+//     notification.hashCode,
+//     notification.title,
+//     notification.body,
+//     NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         _androidChannel.id,
+//         _androidChannel.name,
+//         channelDescription: _androidChannel.description,
+//         importance: Importance.high,
+//         priority: Priority.high,
+//         icon: '@mipmap/launcher_icon',
+//       ),
+//     ),
+//     payload: jsonEncode(message.toMap()),
+//   );
+// });
 
     FirebaseMessaging.onMessage.listen((message) async {
       await saveNotificationToFirestore(message);

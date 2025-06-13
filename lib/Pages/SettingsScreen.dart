@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Constant/ShowErrorToSnackBar.dart';
 import 'package:flutter_application_1/Constant/settings/Custom_Dialogs.dart';
 import 'package:flutter_application_1/Constant/settings/Custom_About.dart';
 import 'package:flutter_application_1/Constant/settings/Section_Card.dart';
@@ -39,7 +40,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     fetchUserData();
+    // loadNotificationSetting();
   }
+//   Future<void> loadNotificationSetting() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   final enabled = prefs.getBool('notifications_enabled') ?? true;
+//   setState(() {
+//     _notificationsEnabled = enabled;
+//   });
+// }
 
   Future<void> fetchUserData() async {
     try {
@@ -185,6 +194,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 value: _notificationsEnabled,
                                 onChanged: (value) => setState(
                                     () => _notificationsEnabled = value),
+
+//                                 onChanged: (value) async {
+//   setState(() => _notificationsEnabled = value);
+
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.setBool('notifications_enabled', value);
+
+//   if (!value) {
+//     // Notifications are now disabled
+//     showErrorTopSnackBar(context, 'Notifications are disabled. You will only see them in the app.');
+//   }
+// },
                               ),
                               SwitchRow(
                                 icon: Icons.dark_mode,

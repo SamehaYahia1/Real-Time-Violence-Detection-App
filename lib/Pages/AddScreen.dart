@@ -7,6 +7,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
 
@@ -26,7 +28,13 @@ class _AddScreenState extends State<AddScreen> {
   bool _isSubmitting = false; //Tracks whether the camera is being submitted.
   String _selectedStream = 'stream1';
   final List<String> _streamOptions = ['stream1', 'profile1', 'profile0'];
-//A7A
+  //save the location in shared preferences with camera name
+  Future<void> saveCameraLocationLocally(
+      String cameraName, String location) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('location_$cameraName', location);
+  }
+
   Future<void> _submitCameraData() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -63,8 +71,8 @@ class _AddScreenState extends State<AddScreen> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        showErrorTopSnackBar(
-            context, " $cameraName✅Camera added successfully.");
+        await saveCameraLocationLocally(cameraName, _locationController.text);
+        showErrorTopSnackBar(context, " $cameraName✅ added successfully.");
       } else if (response.statusCode == 500) {
         showErrorTopSnackBar(context, "⚠️ Camera already exists.");
       } else {
