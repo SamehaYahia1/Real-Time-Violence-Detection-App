@@ -62,11 +62,17 @@ class _HomeuserscreenState extends State<Homeuserscreen> {
     }
 
     _screens = [
-      AddScreen(),
-      VideoScreen(),
-      CameraListScreen(),
-      NotificationsScreen(),
-      SettingsScreen(),
+      AddScreen(), // 0
+      VideoScreen(), // 1
+      CameraListScreen(), // 2
+      NotificationsScreen(
+        onTapNotification: (newIndex) {
+          setState(() {
+            index = newIndex;
+          });
+        },
+      ), // 3
+      SettingsScreen(), // 4
     ];
   }
 

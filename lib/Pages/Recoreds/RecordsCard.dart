@@ -5,6 +5,7 @@ class RecordCard extends StatefulWidget {
   final String time;
   final String size;
   final bool isOutdoor;
+  final String thumbnailUrl; // NEW
 
   const RecordCard({
     super.key,
@@ -12,6 +13,7 @@ class RecordCard extends StatefulWidget {
     required this.time,
     required this.size,
     this.isOutdoor = false,
+    required this.thumbnailUrl, // NEW
   });
 
   @override
@@ -34,29 +36,31 @@ class _RecordCardState extends State<RecordCard> {
             alignment: Alignment.center,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Stack(
-                  children: [
-                    Image.asset(
-                      widget.isOutdoor
-                          ? "Assets/images/recording.png"
-                          : "Assets/images/recording.png",
-                      width: 70,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                    Container(
-                      width: 70,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color:
-                            Colors.white.withOpacity(0.2), // Adjust fade here
-                        borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Stack(
+                    children: [
+                      Image.network(
+                        widget.thumbnailUrl,
+                        width: 70,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.black12,
+                          width: 70,
+                          height: 50,
+                          child: Icon(Icons.image_not_supported),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                      Container(
+                        width: 70,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      )
+                    ],
+                  )),
               const Icon(Icons.play_circle_fill,
                   color: Color.fromARGB(157, 0, 0, 0), size: 28),
             ],

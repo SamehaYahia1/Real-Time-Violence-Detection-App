@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_application_1/Pages/Notifactions/NotificationScreen.dart';
 import 'package:flutter_application_1/main.dart';
 
 class AppNotification {
@@ -89,6 +88,37 @@ class FirebaseApi {
       badge: true,
       sound: true,
     );
+//     FirebaseMessaging.onMessage.listen((message) async {
+//   await saveNotificationToFirestore(message); // Always save to Firestore
+
+//   final prefs = await SharedPreferences.getInstance();
+//   final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+
+//   if (!notificationsEnabled) {
+//     print('🔕 Notifications are disabled — not showing locally.');
+//     return; // Do not show local notification
+//   }
+
+//   final notification = message.notification;
+//   if (notification == null) return;
+
+//   _localNotifications.show(
+//     notification.hashCode,
+//     notification.title,
+//     notification.body,
+//     NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         _androidChannel.id,
+//         _androidChannel.name,
+//         channelDescription: _androidChannel.description,
+//         importance: Importance.high,
+//         priority: Priority.high,
+//         icon: '@mipmap/launcher_icon',
+//       ),
+//     ),
+//     payload: jsonEncode(message.toMap()),
+//   );
+// });
 
     FirebaseMessaging.onMessage.listen((message) async {
       await saveNotificationToFirestore(message);
@@ -136,6 +166,13 @@ Future<bool> isConnected() async {
 }
 
 Future<void> saveNotificationToFirestore(RemoteMessage message) async {
+  print('🚀 Title: ${message.notification?.title}');
+  print('🚀 Body: ${message.notification?.body}');
+  print('🚀 Data: ${message.data}'); // Prints custom data in your FCM message
+  print('🚀 Message ID: ${message.messageId}');
+  print('Thumbnail URL: ${message.data['thumbnail_url']}');
+  print('Incident Video URL: ${message.data['Incident_video_url']}');
+
   if (!await isConnected()) {
     print('⚠️ No internet connection. Skipping Firestore save.');
     return;
@@ -165,6 +202,14 @@ Future<void> saveNotificationToFirestore(RemoteMessage message) async {
       'title': message.notification?.title ?? 'No Title',
       'body': message.notification?.body ?? 'No Body',
       'timestamp': FieldValue.serverTimestamp(),
+      'data': {
+        'camera_id': message.data['camera_id'],
+        'event_type': message.data['event_type'],
+        'event_timestamp': message.data['event_timestamp'],
+        'incident_video_url': message.data['incident_video_url'],
+        'thumbnail_url': message.data['thumbnail_url'],
+        'message_version': message.data['message_version'],
+      }
     });
   } catch (e) {
     print('🔥 Error saving notification: $e');
