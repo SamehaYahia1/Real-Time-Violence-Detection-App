@@ -43,28 +43,65 @@ class _CameraDisplayScreenState extends State<CameraDisplayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(widget.cameraName,
-            style: const TextStyle(color: Colors.white)),
-        elevation: 0,
-      ),
-      body: Center(
+      backgroundColor: const Color(0xFFE9F0FF),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("Assets/images/camera_bg.png"),
+            fit: BoxFit.scaleDown,
+            alignment: Alignment(0, 0.15),
+            colorFilter: ColorFilter.mode(Color(0xFFE9F0FF), BlendMode.dstATop),
+          ),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Displaying the live feed from ${widget.cameraName}",
-              style: const TextStyle(fontSize: 18, color: Colors.black),
+            PreferredSize(
+              preferredSize: const Size.fromHeight(50),
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(30)),
+                child: AppBar(
+                  backgroundColor: const Color(0xFFBFD7ED),
+                  leadingWidth: 30,
+                  titleSpacing: 8,
+                  // elevation: 4,
+                  // automaticallyImplyLeading: false,
+                  title: Row(
+                    children: [
+                      Icon(Icons.camera_alt, color: Colors.black87),
+                      SizedBox(width: 10),
+                      Text("${widget.cameraName} Live Feed",
+                          style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87)),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 400,
-              height: 300,
-              child: VlcPlayer(
-                controller: _vlcViewController,
-                aspectRatio: 16 / 9,
-                placeholder: const Center(child: CircularProgressIndicator()),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Text(
+                    //   "Displaying the live feed from ${widget.cameraName}",
+                    //   style: const TextStyle(fontSize: 18, color: Colors.black),
+                    // ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: 400,
+                      height: 300,
+                      child: VlcPlayer(
+                        controller: _vlcViewController,
+                        aspectRatio: 16 / 9,
+                        placeholder:
+                            const Center(child: CircularProgressIndicator()),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

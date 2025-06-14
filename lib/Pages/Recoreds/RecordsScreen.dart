@@ -1,14 +1,41 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Pages/Recoreds/RecordDisplay.dart';
 import 'package:flutter_application_1/Pages/Recoreds/RecordsCard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VideoScreen extends StatefulWidget {
-  const VideoScreen({super.key});
+  const VideoScreen({Key? key}) : super(key: key);
 
   @override
-  State<VideoScreen> createState() => _VideoScreenState();
+  _VideoScreenState createState() => _VideoScreenState();
 }
 
 class _VideoScreenState extends State<VideoScreen> {
+  Future<String?> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId'); // make sure you previously saved it
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? _notificationStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserId().then((userId) {
+      if (userId != null) {
+        setState(() {
+          _notificationStream = FirebaseFirestore.instance
+              .collection('notifications')
+              .doc(userId)
+              .collection('items')
+              .orderBy('timestamp', descending: true)
+              .snapshots();
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,59 +76,62 @@ class _VideoScreenState extends State<VideoScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: const [
-                  // _buildSectionTitle("Today"),
-                  SizedBox(height: 10),
-                  RecordCard(
-                      title: "2020611_Living Room",
-                      time: "12:30 PM",
-                      size: "36.9 MB"),
-                  RecordCard(
-                      title: "2020610_Kitchen",
-                      time: "10:30 AM",
-                      size: "36.9 MB"),
-                  RecordCard(
-                      title: "2020609_Bed Room",
-                      time: "08:30 AM",
-                      size: "36.9 MB"),
-                  // const SizedBox(height: 10),
-                  // _buildSectionTitle("Yesterday"),
-                  // const SizedBox(height: 10),
-                  RecordCard(
-                      title: "2020608_Family Room",
-                      time: "21:30 PM",
-                      size: "36.9 MB"),
-                  RecordCard(
-                      title: "2020607_Kitchen",
-                      time: "20:30 PM",
-                      size: "36.9 MB"),
-                  RecordCard(
-                      title: "2020606_Terrace",
-                      time: "17:25 PM",
-                      size: "36.9 MB",
-                      isOutdoor: true),
+                child: _notificationStream == null
+                    ? Center(child: CircularProgressIndicator())
+                    : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: _notificationStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
+                            return Center(child: Text('No recordings.'));
+                          }
+                          final documents = snapshot.data!.docs;
 
-                  RecordCard(
-                      title: "2020607_Kitchen",
-                      time: "20:30 PM",
-                      size: "36.9 MB"),
-                  RecordCard(
-                      title: "2020606_Terrace",
-                      time: "17:25 PM",
-                      size: "36.9 MB",
-                      isOutdoor: true),
-                ],
-              ),
-            ),
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              final data = documents[index].data();
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => RecordDisplay(
+                                                videoUrl: data['data']?[
+                                                        'incident_video_url'] ??
+                                                    '',
+                                              )));
+                                },
+                                child: RecordCard(
+                                  title: data['title'] ?? 'Unknown',
+                                  time: (data['timestamp'] as Timestamp?)
+                                          ?.toDate()
+                                          .toString() ??
+                                      '',
+                                  size: '',
+                                  isOutdoor: true,
+                                  thumbnailUrl:
+                                      data['data']?['thumbnail_url'] ?? '',
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ))
           ],
         ),
       ),

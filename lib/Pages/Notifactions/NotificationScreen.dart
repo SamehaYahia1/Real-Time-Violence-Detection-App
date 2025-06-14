@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
+import 'package:flutter_application_1/main.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  NotificationsScreen({super.key});
+  final Function(int)? onTapNotification;
+
+  const NotificationsScreen({super.key, this.onTapNotification});
 
   static const route = '/notifications-screen';
 
@@ -150,7 +153,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(16),
                                 onTap: () {
-                                  // Handle notification tap
+                                  if (widget.onTapNotification != null) {
+                                    widget.onTapNotification!(1);
+                                    // 1 is the index of Records in your bottom nav
+                                  }
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
@@ -244,34 +250,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                                 color: Colors.grey[900],
                                               ),
                                             ),
-                                            // if (isNew)
-                                            //   Align(
-                                            //     alignment:
-                                            //         Alignment.centerRight,
-                                            //     child: Container(
-                                            //       margin:
-                                            //           EdgeInsets.only(top: 6),
-                                            //       padding: EdgeInsets.symmetric(
-                                            //           horizontal: 8,
-                                            //           vertical: 2),
-                                            //       decoration: BoxDecoration(
-                                            //         color: Color(0xFF4A90E2)
-                                            //             .withOpacity(0.1),
-                                            //         borderRadius:
-                                            //             BorderRadius.circular(
-                                            //                 10),
-                                            //       ),
-                                            //       // child: Text(
-                                            //       //   "New",
-                                            //       //   style: TextStyle(
-                                            //       //     fontSize: 12,
-                                            //       //     color: Color(0xFF4A90E2),
-                                            //       //     fontWeight:
-                                            //       //         FontWeight.bold,
-                                            //       //   ),
-                                            //       // ),
-                                            //     ),
-                                            // ),
                                           ],
                                         ),
                                       ),

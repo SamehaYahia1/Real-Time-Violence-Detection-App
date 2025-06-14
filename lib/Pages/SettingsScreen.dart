@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Constant/ShowErrorToSnackBar.dart';
-import 'package:flutter_application_1/Constant/settings/Custom_Dialogs.dart';
 import 'package:flutter_application_1/Constant/settings/Custom_About.dart';
+import 'package:flutter_application_1/Constant/settings/Custom_Dialogs.dart';
 import 'package:flutter_application_1/Constant/settings/Section_Card.dart';
 import 'package:flutter_application_1/Constant/settings/settings_widgets.dart.dart';
 import 'package:flutter_application_1/Constant/token_handler.dart';
@@ -9,6 +8,9 @@ import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
 import 'package:flutter_application_1/Pages/Start/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:flutter_application_1/Constant/api_endpoint.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,6 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String email = '';
   bool isLoading = true;
   String plan = '';
+  int connectedCameras = 0;
 
   final List<String> regions = [
     'United States',
@@ -40,6 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     fetchUserData();
+
+    fetchCamerasCount();
     // loadNotificationSetting();
   }
 //   Future<void> loadNotificationSetting() async {
@@ -53,19 +58,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> fetchUserData() async {
     try {
       final token = await TokenHandler().getToken();
-      // print("Token: $token");
 
       if (token == null) {
         throw Exception('Token not found');
       }
-
-      // ✅ Decode the token directly to extract user data
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
 
-      // print("Decoded Token: $decodedToken");
-
       setState(() {
-        // Your 'name' is an array: ["username", "fullname"]
         fullname = decodedToken['name']?[1] ?? 'Unknown';
         email = decodedToken['email'] ?? 'unknown@example.com';
         plan = decodedToken['SubscriptionPlanId'] ?? 'Unknown';
@@ -78,7 +77,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error decoding token: $e')),
       );
-      print('Error decoding token: $e');
+    }
+  }
+
+  Future<void> fetchCamerasCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    final token = await TokenHandler().getToken();
+
+    if (token == null || userId == null || mounted == false) {
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${ApiEndpoints.baseUrl}/api/Camera/UserCameras?userId=$userId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        connectedCameras = data.length;
+      });
+    } else {
+      setState(() {
+        connectedCameras = 0;
+      });
     }
   }
 
@@ -149,7 +177,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: const Icon(Icons.logout, color: Colors.black87),
                       tooltip: 'Logout',
                       onPressed: _logout,
-                    ),
+                    )
                   ],
                   automaticallyImplyLeading: false,
                   title: const Row(
@@ -180,9 +208,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 label: 'Name',
                                 value: fullname,
                               ),
-                              InfoRow(label: 'Email', value: email),
-                              InfoRow(label: 'Cameras', value: '4 connected'),
-                              InfoRow(label: 'Plan', value: plan),
+                              InfoRow(
+                                label: 'Email',
+                                value: email,
+                              ),
+                              InfoRow(
+                                label: 'Cameras',
+                                value: '$connectedCameras connected',
+                              ),
+                              InfoRow(
+                                label: 'Plan',
+                                value: plan,
+                              ),
                             ],
                           ),
                           SectionCard(
@@ -247,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                     ),
-            ),
+            )
           ],
         ),
       ),
