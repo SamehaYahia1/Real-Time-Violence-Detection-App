@@ -53,9 +53,18 @@ class _CameraListScreenState extends State<CameraListScreen> {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      final List<CameraModel> loadedCameras =
-          data.map((json) => CameraModel.fromJson(json)).toList();
-      if (!mounted) return;
+      final List<CameraModel> loadedCameras = [];
+      for (var jsonCamera in data) {
+        final camera = CameraModel.fromJson(jsonCamera);
+        final location =
+            prefs.getString('location_${camera.cameraName}') ?? 'Unknown';
+        camera.location = location;
+        loadedCameras.add(camera);
+      }
+
+      // final List<CameraModel> loadedCameras =
+      //     data.map((json) => CameraModel.fromJson(json)).toList();
+      // if (!mounted) return;
 
       setState(() {
         _cameras = loadedCameras;
@@ -149,7 +158,8 @@ class _CameraListScreenState extends State<CameraListScreen> {
                             final camera = _cameras[index];
                             return CameraCard(
                               cameraName: camera.cameraName,
-                              location: "Home",
+                              //must update them
+                              location: camera.location,
                               isOnline: true,
                               onTap: () {
                                 Navigator.push(

@@ -43,8 +43,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     fetchUserData();
+
     fetchCamerasCount();
+    // loadNotificationSetting();
   }
+//   Future<void> loadNotificationSetting() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   final enabled = prefs.getBool('notifications_enabled') ?? true;
+//   setState(() {
+//     _notificationsEnabled = enabled;
+//   });
+// }
 
   Future<void> fetchUserData() async {
     try {
@@ -222,6 +231,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 value: _notificationsEnabled,
                                 onChanged: (value) => setState(
                                     () => _notificationsEnabled = value),
+
+//                                 onChanged: (value) async {
+//   setState(() => _notificationsEnabled = value);
+
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.setBool('notifications_enabled', value);
+
+//   if (!value) {
+//     // Notifications are now disabled
+//     showErrorTopSnackBar(context, 'Notifications are disabled. You will only see them in the app.');
+//   }
+// },
                               ),
                               SwitchRow(
                                 icon: Icons.dark_mode,
