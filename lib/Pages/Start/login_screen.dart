@@ -290,34 +290,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
                           const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: false,
-                                    onChanged: (value) {},
-                                    side:
-                                        const BorderSide(color: colors.white2),
-                                    checkColor: Colors.black,
-                                  ),
-                                  const Text(
-                                    'Remember me',
-                                    style: TextStyle(color: colors.textColor),
-                                  ),
-                                ],
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  'Forgot password',
-                                  style: TextStyle(color: colors.textColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
@@ -348,46 +320,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                       )),
                           ),
                           const SizedBox(height: 20),
-                          const Row(
-                            children: [
-                              Expanded(
-                                  child: Divider(color: colors.accentColor)),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text('Or',
-                                    style: TextStyle(color: colors.white)),
-                              ),
-                              Expanded(
-                                  child: Divider(color: colors.accentColor)),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.g_mobiledata,
-                                      size: 28, color: colors.secondaryColor),
-                                  label: const Text('GOOGLE',
-                                      style: TextStyle(
-                                          color: colors.secondaryColor)),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color: colors.accentColor),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                            ],
-                          ),
-                          const SizedBox(height: 30),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Constant/Background_container.dart';
+import 'package:flutter_application_1/Constant/custome_header_appBar.dart';
 import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
 import 'package:flutter_application_1/main.dart';
 
@@ -44,49 +46,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFE9F0FF),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("Assets/images/camera_bg.png"),
-            fit: BoxFit.scaleDown,
-            alignment: Alignment(0, 0.15),
-            colorFilter: ColorFilter.mode(
-              Color(0xFFE9F0FF),
-              BlendMode.dstATop,
-            ),
-          ),
-        ),
+      body: BackgroundContainer(
         child: Column(
           children: [
-            // AppBar with your exact styling
-            PreferredSize(
-              preferredSize: const Size.fromHeight(50),
-              child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(30)),
-                child: AppBar(
-                  backgroundColor: const Color(0xFFBFD7ED),
-                  elevation: 4,
-                  automaticallyImplyLeading: false,
-                  title: const Row(
-                    children: [
-                      Icon(Icons.notifications, color: Colors.black87),
-                      SizedBox(width: 10),
-                      Text(
-                        "Notifications",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            const CustomHeaderAppBar(
+              icon: Icons.notifications,
+              title: "Notifications",
             ),
-
-            // Main content with all previous enhancements
             Expanded(
               child: sortedNotifications.isEmpty
                   ? Center(

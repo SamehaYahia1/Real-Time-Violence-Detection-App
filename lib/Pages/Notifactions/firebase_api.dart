@@ -18,6 +18,7 @@ class AppNotification {
     this.timestamp,
   });
 }
+//test
 
 List<AppNotification> notificationList = [];
 ValueNotifier<int> notificationCounter = ValueNotifier<int>(0);
@@ -171,7 +172,7 @@ Future<void> saveNotificationToFirestore(RemoteMessage message) async {
   print('🚀 Data: ${message.data}'); // Prints custom data in your FCM message
   print('🚀 Message ID: ${message.messageId}');
   print('Thumbnail URL: ${message.data['thumbnail_url']}');
-  print('Incident Video URL: ${message.data['Incident_video_url']}');
+  print('Incident Video URL: ${message.data['incident_video_url']}');
 
   if (!await isConnected()) {
     print('⚠️ No internet connection. Skipping Firestore save.');

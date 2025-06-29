@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Constant/Background_container.dart';
 import 'package:flutter_application_1/Constant/ShowErrorToSnackBar.dart';
 import 'package:flutter_application_1/Constant/api_endpoint.dart';
 import 'package:flutter_application_1/Constant/custom_textfieldAdd.dart';
+import 'package:flutter_application_1/Constant/custome_header_appBar.dart';
 import 'package:flutter_application_1/Constant/token_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:http/http.dart' as http;
@@ -101,47 +103,12 @@ class _AddScreenState extends State<AddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE9F0FF),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("Assets/images/camera_bg.png"),
-            fit: BoxFit.scaleDown,
-            alignment: Alignment(0, 0.15),
-            colorFilter: ColorFilter.mode(
-              Color(0xFFE9F0FF),
-              BlendMode.dstATop,
-            ),
-          ),
-        ),
+      body: BackgroundContainer(
         child: Column(
           children: [
-            PreferredSize(
-              preferredSize: const Size.fromHeight(50),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(30),
-                ),
-                child: AppBar(
-                  backgroundColor: const Color(0xFFBFD7ED),
-                  elevation: 4,
-                  shadowColor: Colors.black26,
-                  automaticallyImplyLeading: false,
-                  title: const Row(
-                    children: [
-                      Icon(Icons.add, color: Colors.black87),
-                      SizedBox(width: 10),
-                      Text(
-                        "Add Your New Camera",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            const CustomHeaderAppBar(
+              icon: Icons.add,
+              title: "Add Your New Camera",
             ),
             const SizedBox(height: 5),
             Padding(
