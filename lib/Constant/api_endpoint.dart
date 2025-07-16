@@ -6,5 +6,7 @@ class ApiEndpoints {
   static const String verify = '$baseUrl/api/Auth/verify';
   static const String subscriptionPlans = '$baseUrl/api/SubscriptionPlans';
   //static const String cameras = '$baseUrl/api/Camera/streams';
-  static const String AddCamera = '$baseUrl/api/Camera/add';
+  static const String addCamera = '$baseUrl/api/Camera/add';
+  static const String userCameras = '$baseUrl/api/Camera/UserCameras';
+  static const String sendToken = '$baseUrl/api/Devices/register';
 }

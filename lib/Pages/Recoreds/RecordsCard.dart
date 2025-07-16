@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Pages/Notifactions/url_convert.dart';
 
-class RecordCard extends StatefulWidget {
+class RecordCard extends StatelessWidget {
   final String title;
   final String time;
   final String size;
   final bool isOutdoor;
-  final String thumbnailUrl; // NEW
+  final String thumbnailUrl;
 
   const RecordCard({
     super.key,
@@ -13,14 +14,9 @@ class RecordCard extends StatefulWidget {
     required this.time,
     required this.size,
     this.isOutdoor = false,
-    required this.thumbnailUrl, // NEW
+    required this.thumbnailUrl,
   });
 
-  @override
-  State<RecordCard> createState() => _RecordCardState();
-}
-
-class _RecordCardState extends State<RecordCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,33 +32,45 @@ class _RecordCardState extends State<RecordCard> {
             alignment: Alignment.center,
             children: [
               ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Stack(
-                    children: [
-                      Image.network(
-                        widget.thumbnailUrl,
-                        width: 70,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.black12,
-                          width: 70,
-                          height: 50,
-                          child: Icon(Icons.image_not_supported),
-                        ),
+                borderRadius: BorderRadius.circular(8),
+                child: Stack(
+                  children: [
+                    thumbnailUrl.isNotEmpty
+                        ? Image.network(
+                            fixMinioUrl(thumbnailUrl),
+                            width: 70,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                              color: Colors.black12,
+                              width: 70,
+                              height: 50,
+                              child: const Icon(Icons.image_not_supported),
+                            ),
+                          )
+                        : Image.asset(
+                            'Assets/images/recording.png',
+                            width: 70,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                    Container(
+                      width: 70,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      Container(
-                        width: 70,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      )
-                    ],
-                  )),
-              const Icon(Icons.play_circle_fill,
-                  color: Color.fromARGB(157, 0, 0, 0), size: 28),
+                    )
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.play_circle_fill,
+                color: Color.fromARGB(157, 0, 0, 0),
+                size: 28,
+              ),
             ],
           ),
           const SizedBox(width: 12),
@@ -71,7 +79,7 @@ class _RecordCardState extends State<RecordCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.title,
+                  title,
                   style: const TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.w600,
@@ -79,7 +87,7 @@ class _RecordCardState extends State<RecordCard> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  widget.time,
+                  time,
                   style: const TextStyle(
                     color: Colors.black54,
                     fontSize: 13,
@@ -89,7 +97,7 @@ class _RecordCardState extends State<RecordCard> {
             ),
           ),
           Text(
-            widget.size,
+            size,
             style: const TextStyle(
               color: Colors.black54,
               fontSize: 13,

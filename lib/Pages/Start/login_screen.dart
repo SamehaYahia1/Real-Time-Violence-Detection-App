@@ -37,6 +37,40 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _SendFCMTokenToBackend(String userId, String token) async {
+    final fcmToken = FirebaseApi.fCMToken;
+    print("🔑 Current FCM Token: $fcmToken");
+    if (fcmToken == null) {
+      print("❌ FCM token is null. Skipping registration.");
+      return;
+    }
+    final url = Uri.parse('${ApiEndpoints.baseUrl}/api/Devices/register');
+    print("🚀 Sending FCM token: $fcmToken to backend...");
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          "fcmToken": fcmToken,
+          "userId": userId,
+        }),
+      );
+
+      print("🔔 Backend Response: ${response.statusCode} - ${response.body}");
+
+      if (response.statusCode == 200) {
+        print("✅ FCM token registered successfully");
+      } else {
+        print("❌ Failed to register FCM token: ${response.body}");
+      }
+    } catch (e) {
+      print("🔥 Error sending FCM token: $e");
+    }
+  }
+
   String _extractLoginErrorMessage(String responseBody) {
     try {
       final decoded = json.decode(responseBody);
@@ -84,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
           await prefs.setString('userId', userId);
+          await _SendFCMTokenToBackend(userId, token);
           await loadNotificationsFromFirestore();
           notificationCounter.value = notificationList.length;
           final SubscriptionId = decodedToken["SubscriptionPlanId"];

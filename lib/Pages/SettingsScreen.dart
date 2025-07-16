@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Constant/ShowErrorToSnackBar.dart';
 import 'package:flutter_application_1/Constant/settings/Custom_About.dart';
 import 'package:flutter_application_1/Constant/settings/Custom_Dialogs.dart';
 import 'package:flutter_application_1/Constant/settings/Section_Card.dart';
@@ -13,7 +14,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final String cameraId;
+  const SettingsScreen({super.key, required this.cameraId});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -21,6 +23,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
+  bool _aiProcessingEnabled = false;
   bool _darkModeEnabled = false;
   String _selectedRegion = 'United States';
   String fullname = '';
@@ -28,6 +31,108 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool isLoading = true;
   String plan = '';
   int connectedCameras = 0;
+  void _toggleAiProcessing(bool value) async {
+    setState(() {
+      _aiProcessingEnabled = value;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(
+        'ai_processing_${widget.cameraId}', value); // Save state
+
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      showErrorTopSnackBar(context, 'Authentication token not found.');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Authentication token not found.')),
+      // );
+      return;
+    }
+
+    final endpoint = _aiProcessingEnabled
+        ? '/api/aiprocessing/${widget.cameraId}/start'
+        : '/api/aiprocessing/${widget.cameraId}/stop';
+
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiEndpoints.baseUrl}$endpoint'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Server responded with ${response.statusCode}');
+      }
+      showErrorTopSnackBar(
+          context,
+          _aiProcessingEnabled
+              ? 'AI processing started.'
+              : 'AI processing stopped.');
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text(_aiProcessingEnabled
+      //         ? 'AI processing started.'
+      //         : 'AI processing stopped.'),
+      //   ),
+      // );
+    } catch (e) {
+      print('AI processing toggle failed: $e');
+      showErrorTopSnackBar(context, 'Failed to update AI processing state.');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Failed to update AI processing state.')),
+      // );
+    }
+  }
+
+  // void _toggleAiProcessing(bool value) async {
+  //   setState(() {
+  //     _aiProcessingEnabled = value;
+  //   });
+
+  //   final tokenPrefs = await SharedPreferences.getInstance();
+  //   final token = tokenPrefs.getString('token'); // or however you store it
+
+  //   if (token == null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Authentication token not found.')),
+  //     );
+  //     return;
+  //   }
+
+  //   final endpoint = _aiProcessingEnabled
+  //       ? '/api/aiprocessing/${widget.cameraId}/start'
+  //       : '/api/aiprocessing/${widget.cameraId}/stop';
+
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('${ApiEndpoints.baseUrl}$endpoint'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     );
+
+  //     if (response.statusCode != 200) {
+  //       throw Exception('Server responded with ${response.statusCode}');
+  //     }
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //           content: Text(_aiProcessingEnabled
+  //               ? 'AI processing started.'
+  //               : 'AI processing stopped.')),
+  //     );
+  //   } catch (e) {
+  //     print('AI processing toggle failed: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Failed to update AI processing state.')),
+  //     );
+  //   }
+  // }
 
   final List<String> regions = [
     'United States',
@@ -43,10 +148,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     fetchUserData();
-
+    loadAiProcessingSetting();
     fetchCamerasCount();
     // loadNotificationSetting();
   }
+
 //   Future<void> loadNotificationSetting() async {
 //   final prefs = await SharedPreferences.getInstance();
 //   final enabled = prefs.getBool('notifications_enabled') ?? true;
@@ -54,6 +160,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 //     _notificationsEnabled = enabled;
 //   });
 // }
+  Future<void> loadAiProcessingSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedValue =
+        prefs.getBool('ai_processing_${widget.cameraId}') ?? false;
+    setState(() {
+      _aiProcessingEnabled = savedValue;
+    });
+  }
 
   Future<void> fetchUserData() async {
     try {
@@ -243,6 +357,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 //     showErrorTopSnackBar(context, 'Notifications are disabled. You will only see them in the app.');
 //   }
 // },
+                              ),
+                              SwitchRow(
+                                icon: Icons.smart_toy_outlined,
+                                label: 'AI Processing',
+                                value: _aiProcessingEnabled,
+                                onChanged: _toggleAiProcessing,
                               ),
                               SwitchRow(
                                 icon: Icons.dark_mode,

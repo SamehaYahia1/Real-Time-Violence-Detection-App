@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Pages/Notifactions/url_convert.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -38,6 +39,7 @@ void handleMessage(RemoteMessage? message) async {
 
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
+  static String? fCMToken;
   final _androidChannel = const AndroidNotificationChannel(
     'high_importance_channel',
     'High Importance Notifications',
@@ -49,7 +51,7 @@ class FirebaseApi {
 
   Future<void> initNotification() async {
     await _firebaseMessaging.requestPermission();
-    final fCMToken = await _firebaseMessaging.getToken();
+    fCMToken = await _firebaseMessaging.getToken();
     print("Firebase Messaging Token: $fCMToken");
 
     FirebaseFirestore.instance.settings = const Settings(
@@ -198,6 +200,13 @@ Future<void> saveNotificationToFirestore(RemoteMessage message) async {
       print('Notification already saved, skipping duplicate.');
       return;
     }
+    final rawThumbnailUrl = message.data['thumbnail_url'] ?? '';
+    final rawIncidentUrl = message.data['incident_video_url'] ?? '';
+    final fixedThumbnailUrl = fixMinioUrl(rawThumbnailUrl);
+    final fixedIncidentUrl = fixMinioUrl(rawIncidentUrl);
+
+    print('🛠️ Fixed Thumbnail URL: $fixedThumbnailUrl');
+    print('🛠️ Fixed Incident Video URL: $fixedIncidentUrl');
 
     await userNotificationsRef.set({
       'title': message.notification?.title ?? 'No Title',
@@ -207,8 +216,10 @@ Future<void> saveNotificationToFirestore(RemoteMessage message) async {
         'camera_id': message.data['camera_id'],
         'event_type': message.data['event_type'],
         'event_timestamp': message.data['event_timestamp'],
-        'incident_video_url': message.data['incident_video_url'],
-        'thumbnail_url': message.data['thumbnail_url'],
+        'incident_video_url': fixedIncidentUrl,
+        'thumbnail_url': fixedThumbnailUrl,
+        // 'incident_video_url': message.data['incident_video_url'],
+        // 'thumbnail_url': message.data['thumbnail_url'],
         'message_version': message.data['message_version'],
       }
     });
