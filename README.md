@@ -96,7 +96,7 @@ The app architecture is designed using the **MVVM (Model–View–ViewModel)** p
 
 The diagram below represents the end-to-end flow of the mobile app:
 
-![App Flow](./app-flow.png)
+![App Flow](https://github.com/SamehaYahia1/Real-Time-Violence-Detection-App/blob/b26932d57500e810e7980096ff47835729a9c44d/User%20journey%20mapping%20(3).jpeg?raw=true)
 
 > The flow starts when the user opens the app and continues through login, camera management, notification alerts, and video playback — reflecting the real-time interaction between the mobile app, backend API, and AI services.
 
