@@ -17,7 +17,7 @@ This system is composed of three main repositories working together:
 
 | Component | Repository | Description |
 |------------|-------------|-------------|
-| ⚙️ **Backend API** | [Real-Time-Violence-Detection-Backend](https://github.com/SamehaYahia1/Real-Time-Violence-Detection-Backend) | Handles authentication, camera management, subscriptions, and coordination with AI services |
+| ⚙️ **Backend API** | [Real-Time-Violence-Detection-Backend](https://github.com/SamehaYahia1/Real-Time-Violence-Detection) | Handles authentication, camera management, subscriptions, and coordination with AI services |
 | 🧠 **AI Microservices** | [Violence-Detection-AI-Services](https://github.com/SamehaYahia1/Violence-Detection-AI-Services) | Python-based AI services for real-time video analysis and detection |
 | 📱 **Mobile App (this repo)** | [Real-Time-Violence-Detection-App](https://github.com/SamehaYahia1/Real-Time-Violence-Detection-App) | Flutter frontend for users to interact with the system and receive alerts |
 
