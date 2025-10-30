@@ -39,6 +39,69 @@ This system is composed of three main repositories working together:
 
 ---
 
+## 🧭 App Architecture & Flow
+
+The mobile application follows a clean, user-friendly flow that connects all the system’s core functionalities — from authentication to real-time alerts and video playback.  
+
+The app architecture is designed using the **MVVM (Model–View–ViewModel)** pattern to separate the business logic from the UI, ensuring scalability and maintainability.
+
+---
+
+### 🔄 App Flow Overview
+
+1. **App Launch (Splash Screen):**  
+   When the user opens the app, a splash screen with the project logo appears while the app initializes required services.
+
+2. **Authentication:**  
+   Users can either sign up for a new account or log in using their credentials.  
+   The app communicates with the ASP.NET backend for secure authentication via JWT tokens.
+
+3. **PIN Verification:**  
+   For enhanced security, users verify their login using a 4-digit PIN before accessing the main dashboard.
+
+4. **Main Dashboard:**  
+   After login, users are redirected to the home screen, where they can:
+   - View connected cameras  
+   - Check the camera’s current status (online/offline)  
+   - Access real-time video streams
+
+5. **Add Camera:**  
+   From the add camera screen, users can manually input their camera credentials (IP, port, username, password) to connect new streams to the system.
+
+6. **Notifications:**  
+   Whenever the AI backend detects a violent or suspicious activity, a **real-time push notification** is sent to the app through **Firebase Cloud Messaging (FCM)**.  
+   Users can open these alerts to view detailed incident information.
+
+7. **Recorded Videos:**  
+   Detected events are saved in MinIO storage and retrieved through the backend.  
+   The user can view these recorded clips directly from the app’s “Records” tab.
+
+8. **Settings:**  
+   Users can manage account information, switch between dark and light modes, and contact support.
+
+---
+
+### 🧩 Architecture Summary
+
+| Layer | Description |
+|--------|-------------|
+| **Presentation Layer** | Built with Flutter UI components following clean design patterns |
+| **Logic Layer** | Uses Provider for state management and data flow between UI and API |
+| **Data Layer** | Handles communication with the backend API and Firestore (for notifications) |
+| **Integration** | Connected with ASP.NET backend, MinIO, SRS streaming, and FCM for notifications |
+
+---
+
+### 🗺️ Visual Flow
+
+The diagram below represents the end-to-end flow of the mobile app:
+
+![App Flow](./app-flow.png)
+
+> The flow starts when the user opens the app and continues through login, camera management, notification alerts, and video playback — reflecting the real-time interaction between the mobile app, backend API, and AI services.
+
+
+
 ## 🚀 Setup & Run
 
 ### Prerequisites
