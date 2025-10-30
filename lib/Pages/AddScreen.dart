@@ -61,7 +61,8 @@ class _AddScreenState extends State<AddScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('${ApiEndpoints.baseUrl}/api/Camera/add'),
+        // Uri.parse('${ApiEndpoints.baseUrl}/api/Camera/add'),
+        Uri.parse(ApiEndpoints.addCamera),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

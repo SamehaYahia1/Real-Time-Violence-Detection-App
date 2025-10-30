@@ -54,10 +54,15 @@ class _CameraListScreenState extends State<CameraListScreen> {
     );
 
     if (response.statusCode == 200) {
+      print('Raw UserCameras Response: ${response.body}');
       final List<dynamic> data = json.decode(response.body);
       final List<CameraModel> loadedCameras = [];
       for (var jsonCamera in data) {
         final camera = CameraModel.fromJson(jsonCamera);
+
+        // Removed the backend call to start the stream here.
+        // The stream will be initiated only when a camera card is tapped.
+
         final location =
             prefs.getString('location_${camera.cameraName}') ?? 'Unknown';
         camera.location = location;
@@ -128,16 +133,55 @@ class _CameraListScreenState extends State<CameraListScreen> {
                               //must update them
                               location: camera.location,
                               isOnline: true,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CameraDisplayScreen(
-                                      cameraName: camera.cameraName,
-                                      streamUrl: camera.streamUrl,
-                                    ),
-                                  ),
+                              onTap: () async {
+                                final token = await TokenHandler().getToken();
+                                if (token == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Authentication token not found. Please log in again.')),
+                                  );
+                                  return;
+                                }
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setString(
+                                    'selectedCameraId', camera.id);
+
+                                final startStreamResponse = await http.post(
+                                  Uri.parse(
+                                      '${ApiEndpoints.baseUrl}/api/Streams/${camera.id}/start'),
+                                  headers: {
+                                    'Authorization': 'Bearer $token',
+                                    'Content-Type': 'application/json',
+                                  },
                                 );
+
+                                if (startStreamResponse.statusCode == 200) {
+                                  final streamData =
+                                      json.decode(startStreamResponse.body);
+                                  final srsStreamUrl = streamData['url']
+                                      .replaceAll("localhost", "10.0.2.2");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CameraDisplayScreen(
+                                        cameraName: camera.cameraName,
+                                        streamUrl:
+                                            srsStreamUrl, // Pass the SRS stream URL
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  print(
+                                      'Failed to start stream for camera ${camera.cameraName}: ${startStreamResponse.statusCode} - ${startStreamResponse.body}');
+                                  // Show an error message to the user
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Failed to start stream: ${startStreamResponse.body}')),
+                                  );
+                                }
                               },
                             );
                           },

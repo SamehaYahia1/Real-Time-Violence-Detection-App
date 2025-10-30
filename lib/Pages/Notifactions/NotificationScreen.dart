@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Constant/Background_container.dart';
 import 'package:flutter_application_1/Constant/custome_header_appBar.dart';
 import 'package:flutter_application_1/Pages/Notifactions/firebase_api.dart';
-import 'package:flutter_application_1/main.dart';
 
 class NotificationsScreen extends StatefulWidget {
   final Function(int)? onTapNotification;
