@@ -3,10 +3,10 @@
 ## 🔍 Overview
 This mobile application serves as the **frontend interface** of the Real-Time Violence Detection System.  
 It allows users to:
-- 🔐 Log in securely using their credentials.
-- 📸 Add and manage connected cameras.
-- ⚠️ Receive **real-time alerts** when the AI model detects suspicious or violent actions.
-- 🎞️ View saved video clips and notification history.
+-  Log in securely using their credentials.
+-  Add and manage connected cameras.
+-  Receive **real-time alerts** when the AI model detects suspicious or violent actions.
+-  View saved video clips and notification history.
 
 The app communicates with the **ASP.NET Core backend API** and integrates **Firebase Cloud Messaging (FCM)** for push notifications.
 
@@ -17,9 +17,9 @@ This system is composed of three main repositories working together:
 
 | Component | Repository | Description |
 |------------|-------------|-------------|
-| ⚙️ **Backend API** | [Real-Time-Violence-Detection-Backend](https://github.com/SamehaYahia1/Real-Time-Violence-Detection) | Handles authentication, camera management, subscriptions, and coordination with AI services |
-| 🧠 **AI Microservices** | [Violence-Detection-AI-Services](https://github.com/SamehaYahia1/Violence-Detection-AI-Services) | Python-based AI services for real-time video analysis and detection |
-| 📱 **Mobile App (this repo)** | [Real-Time-Violence-Detection-App](https://github.com/SamehaYahia1/Real-Time-Violence-Detection-App) | Flutter frontend for users to interact with the system and receive alerts |
+|  **Backend API** | [Real-Time-Violence-Detection-Backend](https://github.com/SamehaYahia1/Real-Time-Violence-Detection) | Handles authentication, camera management, subscriptions, and coordination with AI services |
+|  **AI Microservices** | [Violence-Detection-AI-Services](https://github.com/SamehaYahia1/Violence-Detection-AI-Services) | Python-based AI services for real-time video analysis and detection |
+|  **Mobile App (this repo)** | [Real-Time-Violence-Detection-App](https://github.com/SamehaYahia1/Real-Time-Violence-Detection-App) | Flutter frontend for users to interact with the system and receive alerts |
 
 ---
 
@@ -43,10 +43,10 @@ This system is composed of three main repositories working together:
 
 ### Prerequisites
 Before running the app, ensure you have:
-- ✅ Flutter SDK installed  
-- ✅ Android Studio or Visual Studio Code  
-- ✅ A configured Firebase project (for notifications)  
-- ✅ The backend API running locally or hosted  
+-  Flutter SDK installed  
+-  Android Studio or Visual Studio Code  
+-  A configured Firebase project (for notifications)  
+-  The backend API running locally or hosted  
 
 ### Steps
 
